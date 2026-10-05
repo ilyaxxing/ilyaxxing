@@ -1,114 +1,85 @@
 #!/usr/bin/env python3
-"""Generates the SVG assets for the profile README.
+"""Draws the two images used in README.md (dark + light versions of each).
 
-Run:  python3 build_assets.py
+    python3 build_assets.py
 
-When a business from the "100" is released, add its slot number to RELEASED.
-The grid fills that cell with the accent colour and moves the "next" marker.
-Example:  RELEASED = [1, 2]
+When a business from the 100 goes public, bump PUBLIC by one and re-run.
+The line fills up and the counter changes. That's it.
 """
 from pathlib import Path
 
-RELEASED: list[int] = []  # slot numbers (1..100) that are public
+PUBLIC = 0  # how many of the 100 are out in the world
 
 OUT = Path(__file__).parent / "assets"
 OUT.mkdir(exist_ok=True)
 
-SANS = "-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+SERIF = "Georgia, 'Iowan Old Style', 'Times New Roman', serif"
 MONO = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
 
 THEMES = {
-    "dark": dict(
-        bg="#0B0B0C", border="#26262A", text="#F3F3F0", sub="#A0A0A6",
-        muted="#6A6A70", cell="#1B1B1F", cell_line="#2A2A2F",
-        accent="#FF5B1F", dot="#FFFFFF", dot_op="0.10",
-    ),
-    "light": dict(
-        bg="#FAFAF7", border="#E3E3DD", text="#0B0B0C", sub="#55555B",
-        muted="#8B8B90", cell="#F0F0EA", cell_line="#DEDED7",
-        accent="#E8480C", dot="#000000", dot_op="0.10",
-    ),
+    "dark": dict(text="#F0F0EC", muted="#8B9098", faint="#30363D", accent="#8FD694", glow="#FFFFFF", glow_op="0.07"),
+    "light": dict(text="#1F2328", muted="#656D76", faint="#D8DEE4", accent="#3F9A4A", glow="#000000", glow_op="0"),
 }
 
 
-def banner(t: dict) -> str:
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="Ilyas. Builder working toward 100 real businesses.">
+def clover(cx: float, cy: float, r: float, color: str) -> str:
+    """Three round leaves and a stem. Sways a little."""
+    leaves = "".join(
+        f'<circle cx="{cx + dx * r:.1f}" cy="{cy + dy * r:.1f}" r="{r:.1f}" fill="{color}"/>'
+        for dx, dy in [(0, -0.95), (-0.85, 0.35), (0.85, 0.35)]
+    )
+    stem = (f'<path d="M{cx:.1f},{cy + 0.4 * r:.1f} q{0.3 * r:.1f},{1.6 * r:.1f} {1.3 * r:.1f},{2.4 * r:.1f}" '
+            f'stroke="{color}" stroke-width="{0.38 * r:.1f}" stroke-linecap="round" fill="none"/>')
+    return (f'<g class="sway" style="transform-origin:{cx:.0f}px {cy + 2.6 * r:.0f}px">'
+            f'{leaves}{stem}</g>')
+
+
+def header(t: dict) -> str:
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="760" height="400" role="img" aria-label="ilyas. I build things on the internet, mostly to see what happens.">
   <style>
-    .blink {{ animation: blink 1.1s steps(1) infinite; }}
-    @keyframes blink {{ 0%,49% {{ opacity: 1 }} 50%,100% {{ opacity: 0 }} }}
-    @media (prefers-reduced-motion: reduce) {{ .blink {{ animation: none; }} }}
+    .sway {{ animation: sway 7s ease-in-out infinite; }}
+    @keyframes sway {{ 0%,100% {{ transform: rotate(-7deg) }} 50% {{ transform: rotate(7deg) }} }}
+    @media (prefers-reduced-motion: reduce) {{ .sway {{ animation: none; }} }}
   </style>
   <defs>
-    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1.2" fill="{t['dot']}" fill-opacity="{t['dot_op']}"/>
-    </pattern>
-    <linearGradient id="fade" x1="0" x2="1" y1="0" y2="0">
-      <stop offset="0.35" stop-color="#fff" stop-opacity="0"/>
-      <stop offset="1" stop-color="#fff" stop-opacity="1"/>
-    </linearGradient>
-    <mask id="m"><rect width="1200" height="320" fill="url(#fade)"/></mask>
+    <radialGradient id="lamp" gradientUnits="userSpaceOnUse" cx="260" cy="215" r="200">
+      <stop offset="0" stop-color="{t['glow']}" stop-opacity="{t['glow_op']}"/>
+      <stop offset="1" stop-color="{t['glow']}" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect x="0.5" y="0.5" width="1199" height="319" rx="20" fill="{t['bg']}" stroke="{t['border']}"/>
-  <rect x="1" y="1" width="1198" height="318" rx="20" fill="url(#dots)" mask="url(#m)"/>
+  <rect width="760" height="400" fill="url(#lamp)"/>
 
-  <text x="64" y="68" font-family="{MONO}" font-size="16" letter-spacing="3" fill="{t['muted']}">BUILDER  /  EARLY STAGE</text>
+  <text x="0" y="214" font-family="{SANS}" font-size="168" font-weight="700" letter-spacing="-8" fill="{t['text']}">ilyas</text>
+  {clover(402, 104, 12, t['accent'])}
 
-  <text x="60" y="176" font-family="{SANS}" font-size="116" font-weight="700" letter-spacing="-5" fill="{t['text']}">Ilyas<tspan fill="{t['accent']}">.</tspan></text>
-
-  <text x="64" y="246" font-family="{SANS}" font-size="30" fill="{t['sub']}">I build products and test them on real people.</text>
-  <text x="64" y="280" font-family="{SANS}" font-size="30" fill="{t['sub']}">The ones that work, I plan to give away.</text>
-
-  <text x="1136" y="68" text-anchor="end" font-family="{MONO}" font-size="16" fill="{t['muted']}">slot 001 / in progress<tspan class="blink" fill="{t['accent']}"> &#9610;</tspan></text>
+  <text x="8" y="300" font-family="{SERIF}" font-style="italic" font-size="38" fill="{t['muted']}">I build things on the internet,</text>
+  <text x="8" y="350" font-family="{SERIF}" font-style="italic" font-size="38" fill="{t['muted']}">mostly to see what happens.</text>
 </svg>
 """
 
 
-def grid(t: dict) -> str:
-    cols, rows, size, gap = 20, 5, 36, 8
-    w = cols * size + (cols - 1) * gap          # 872
-    pad = 4
-    top = 0
-    gh = rows * size + (rows - 1) * gap          # 212
-    foot = 44
-    total_w, total_h = w + pad * 2, gh + foot + pad * 2
-    released = set(RELEASED)
-    nxt = next((i for i in range(1, 101) if i not in released), None)
-
-    cells = []
-    for i in range(1, 101):
-        r, c = divmod(i - 1, cols)
-        x = pad + c * (size + gap)
-        y = pad + top + r * (size + gap)
-        if i in released:
-            cells.append(f'<rect x="{x}" y="{y}" width="{size}" height="{size}" rx="8" fill="{t["accent"]}"/>')
-        elif i == nxt:
-            cells.append(
-                f'<rect class="next" x="{x+1}" y="{y+1}" width="{size-2}" height="{size-2}" rx="8" '
-                f'fill="none" stroke="{t["accent"]}" stroke-width="2"/>'
-                f'<text x="{x+size/2}" y="{y+size/2+4}" text-anchor="middle" font-family="{MONO}" '
-                f'font-size="11" fill="{t["accent"]}">{i:03d}</text>'
-            )
-        else:
-            cells.append(
-                f'<rect x="{x+0.5}" y="{y+0.5}" width="{size-1}" height="{size-1}" rx="8" '
-                f'fill="{t["cell"]}" stroke="{t["cell_line"]}"/>'
-            )
-
-    fy = pad + gh + 30
-    count = f"{len(released):03d} / 100 released"
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {total_w} {total_h}" width="{total_w}" height="{total_h}" role="img" aria-label="{len(released)} of 100 businesses released">
+def progress(t: dict) -> str:
+    x0, x1, y = 56, 580, 40
+    x = x0 + (x1 - x0) * PUBLIC / 100
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 90" width="640" height="90" role="img" aria-label="{PUBLIC} of 100 businesses public">
   <style>
-    .next {{ animation: pulse 2.4s ease-in-out infinite; }}
-    @keyframes pulse {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: 0.35 }} }}
-    @media (prefers-reduced-motion: reduce) {{ .next {{ animation: none; }} }}
+    .ring {{ animation: ring 3.2s ease-out infinite; transform-origin: {x:.0f}px {y}px; }}
+    @keyframes ring {{ 0% {{ transform: scale(1); opacity: .55 }} 100% {{ transform: scale(3.2); opacity: 0 }} }}
+    @media (prefers-reduced-motion: reduce) {{ .ring {{ animation: none; opacity: 0 }} }}
   </style>
-  {chr(10).join('  ' + c for c in cells).strip()}
-  <text x="{pad}" y="{fy}" font-family="{MONO}" font-size="16" letter-spacing="1" fill="{t['sub']}">{count}</text>
+  <text x="{x0 - 16}" y="{y + 5}" text-anchor="end" font-family="{MONO}" font-size="18" fill="{t['text']}">{PUBLIC:02d}</text>
+  <line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="{t['faint']}" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <line x1="{x0}" y1="{y}" x2="{x:.1f}" y2="{y}" stroke="{t['accent']}" stroke-width="2" stroke-linecap="round"/>
+  <circle class="ring" cx="{x:.1f}" cy="{y}" r="5" fill="none" stroke="{t['accent']}" stroke-width="1.5"/>
+  <circle cx="{x:.1f}" cy="{y}" r="5" fill="{t['accent']}"/>
+  <text x="{x1 + 14}" y="{y + 5}" font-family="{MONO}" font-size="18" fill="{t['muted']}">100</text>
+  <text x="{x:.1f}" y="{y + 38}" font-family="{SERIF}" font-style="italic" font-size="19" fill="{t['muted']}">you are here</text>
 </svg>
 """
 
 
 for name, t in THEMES.items():
-    (OUT / f"banner-{name}.svg").write_text(banner(t), encoding="utf-8")
-    (OUT / f"grid-{name}.svg").write_text(grid(t), encoding="utf-8")
-print("assets written to", OUT)
+    (OUT / f"header-{name}.svg").write_text(header(t), encoding="utf-8")
+    (OUT / f"progress-{name}.svg").write_text(progress(t), encoding="utf-8")
+print("done:", sorted(p.name for p in OUT.iterdir()))
