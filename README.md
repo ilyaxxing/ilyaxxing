@@ -1,11 +1,8 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/header-light.svg">
-  <img alt="ilyas. I build things on the internet, mostly to see what happens." src="assets/header-dark.svg" width="560">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg">
+  <img alt="1 of 100 open-source businesses" src="assets/banner-dark.svg" width="100%">
 </picture>
-
-Web apps, Telegram bots and mini apps, AI things, automations, and small internet businesses.
-This is where they get built.
 
 <br>
 
@@ -14,33 +11,21 @@ This is where they get built.
 A personal experiment. Build something real, see if people use it and pay for it, write down what happened. Do that a hundred times.<br>
 The ones that work, I'll give away for free, so anyone can pick them up and launch their own.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/progress-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/progress-light.svg">
-  <img alt="0 of 100 businesses public" src="assets/progress-dark.svg" width="600">
-</picture>
-
 <br>
 
 ### On the bench
 
-Nothing public yet.<br>
-A few things are half-built in private. They'll land here once they're worth showing.
+**[Cash for Cars Lead System](https://github.com/ilyaxxing/cash-for-cars-lead-system)** &nbsp;<sub>open source · 01 / 100 · <a href="https://ilyaxxing.github.io/cash-for-cars-lead-system/">site</a></sub><br>
+Lead system for cash-for-cars buyers: a QR card on the windshield, a short form for the owner, an instant push to the buyer.
 
 <!--
-  When something goes public, replace the two lines above with entries like this
-  (and bump PUBLIC in build_assets.py, then run it):
-
-  **[name](https://link)** &nbsp;<sub>live</sub><br>
-  One line about what it is.
-
-  **[name](https://github.com/ilyaxxing/repo)** &nbsp;<sub>open source · 01 / 100</sub><br>
-  One line about what it is.
+  Add each new business above the previous one, like the entry above,
+  then bump PUBLIC in build_assets.py and run it to update the banner.
 -->
 
 <br>
 <br>
 
 <p align="center">
-  <sub><a href="https://instagram.com/ilyaxxing">instagram</a> &nbsp;·&nbsp; <a href="https://t.me/iiiLY4S">telegram</a></sub>
+  <sub><a href="https://instagram.com/ilyaxxing">instagram</a> &nbsp;·&nbsp; <a href="https://t.me/iiiLY4S">telegram</a> &nbsp;·&nbsp; <a href="https://x.com/spvvqxn">x</a></sub>
 </p>

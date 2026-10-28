@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Draws the two images used in README.md (dark + light versions of each).
+"""Draws the banner used in README.md (dark + light versions).
 
     python3 build_assets.py
 
 When a business from the 100 goes public, bump PUBLIC by one and re-run.
-The line fills up and the counter changes. That's it.
+The grid fills up and the counter changes. That's it.
 """
 from pathlib import Path
 
-PUBLIC = 0  # how many of the 100 are out in the world
+PUBLIC = 1  # how many of the 100 are out in the world
 
 OUT = Path(__file__).parent / "assets"
 OUT.mkdir(exist_ok=True)
@@ -79,7 +79,25 @@ def progress(t: dict) -> str:
 """
 
 
+def banner(t: dict) -> str:
+    """Big 'N / 100' with a 10x10 grid, one cell per business."""
+    cell, gap = 16, 6
+    gx, gy = 1280 - 72 - (10 * cell + 9 * gap), (360 - (10 * cell + 9 * gap)) / 2
+    cells = "".join(
+        f'<rect x="{gx + (i % 10) * (cell + gap)}" y="{gy + (i // 10) * (cell + gap):.0f}" width="{cell}" height="{cell}" rx="4" '
+        f'fill="{t["accent"] if i < PUBLIC else t["faint"]}"/>'
+        for i in range(100)
+    )
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" width="1280" height="360" role="img" aria-label="{PUBLIC} of 100 open-source businesses">
+  <text x="72" y="86" font-family="{MONO}" font-size="20" letter-spacing="0.5" fill="{t['muted']}">@ilyaxxing</text>
+  <text x="64" y="236" font-family="{SANS}" font-size="156" font-weight="700" letter-spacing="-6"><tspan fill="{t['accent']}">{PUBLIC}</tspan><tspan fill="{t['muted']}" font-weight="500"> / 100</tspan></text>
+  <text x="72" y="290" font-family="{SANS}" font-size="28" font-weight="600" fill="{t['text']}">Open-Source Businesses</text>
+  <text x="72" y="326" font-family="{MONO}" font-size="18" fill="{t['muted']}">clone → deploy → sell</text>
+  {cells}
+</svg>
+"""
+
+
 for name, t in THEMES.items():
-    (OUT / f"header-{name}.svg").write_text(header(t), encoding="utf-8")
-    (OUT / f"progress-{name}.svg").write_text(progress(t), encoding="utf-8")
+    (OUT / f"banner-{name}.svg").write_text(banner(t), encoding="utf-8")
 print("done:", sorted(p.name for p in OUT.iterdir()))
