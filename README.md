@@ -33,7 +33,7 @@ QR card on the windshield → short form for the car owner → instant push to t
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="assets/instagram-dark.svg">
       <source media="(prefers-color-scheme: light)" srcset="assets/instagram-light.svg">
-      <img alt="Follow the build on Instagram: @ilyaxxing" src="assets/instagram-dark.svg" width="300">
+      <img alt="Instagram: @ilyaxxing" src="assets/instagram-dark.svg" width="300">
     </picture>
   </a>
 </p>
