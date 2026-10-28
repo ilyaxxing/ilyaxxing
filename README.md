@@ -8,8 +8,7 @@
 
 ### 100 businesses
 
-A personal experiment. Build something real, see if people use it and pay for it, write down what happened. Do that a hundred times.<br>
-The ones that work, I'll give away for free, so anyone can pick them up and launch their own.
+Testing ideas in the real world and turning the winners into open-source businesses anyone can launch.
 
 <br>
 
