@@ -98,6 +98,23 @@ def banner(t: dict) -> str:
 """
 
 
+def instagram(t: dict) -> str:
+    """Pill-shaped 'follow the build' link for the footer."""
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 64" width="340" height="64" role="img" aria-label="Follow the build on Instagram: @ilyaxxing">
+  <rect x="1" y="1" width="338" height="62" rx="31" fill="none" stroke="{t['faint']}" stroke-width="1.5"/>
+  <g fill="none" stroke="{t['text']}" stroke-width="2">
+    <rect x="26" y="20" width="24" height="24" rx="7"/>
+    <circle cx="38" cy="32" r="5.5"/>
+  </g>
+  <circle cx="45" cy="25" r="1.6" fill="{t['text']}"/>
+  <text x="66" y="29" font-family="{MONO}" font-size="12" letter-spacing="0.5" fill="{t['muted']}">follow the build</text>
+  <text x="66" y="48" font-family="{SANS}" font-size="18" font-weight="600" fill="{t['text']}">@ilyaxxing</text>
+  <text x="306" y="38" text-anchor="end" font-family="{SANS}" font-size="20" fill="{t['accent']}">→</text>
+</svg>
+"""
+
+
 for name, t in THEMES.items():
     (OUT / f"banner-{name}.svg").write_text(banner(t), encoding="utf-8")
+    (OUT / f"instagram-{name}.svg").write_text(instagram(t), encoding="utf-8")
 print("done:", sorted(p.name for p in OUT.iterdir()))

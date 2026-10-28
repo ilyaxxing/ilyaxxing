@@ -15,8 +15,10 @@ The ones that work, I'll give away for free, so anyone can pick them up and laun
 
 ### On the bench
 
-**[Cash for Cars Lead System](https://github.com/ilyaxxing/cash-for-cars-lead-system)** &nbsp;<sub>open source · 01 / 100 · <a href="https://ilyaxxing.github.io/cash-for-cars-lead-system/">site</a></sub><br>
-Lead system for cash-for-cars buyers: a QR card on the windshield, a short form for the owner, an instant push to the buyer.
+**[Cash for Cars Lead System](https://github.com/ilyaxxing/cash-for-cars-lead-system)**<br>
+<sub>01 / 100 &nbsp;·&nbsp; open source &nbsp;·&nbsp; <a href="https://ilyaxxing.github.io/cash-for-cars-lead-system/">live site ↗</a></sub>
+
+QR card on the windshield → short form for the car owner → instant push to the buyer.
 
 <!--
   Add each new business above the previous one, like the entry above,
@@ -27,5 +29,11 @@ Lead system for cash-for-cars buyers: a QR card on the windshield, a short form 
 <br>
 
 <p align="center">
-  <sub><a href="https://instagram.com/ilyaxxing">instagram</a> &nbsp;·&nbsp; <a href="https://t.me/iiiLY4S">telegram</a> &nbsp;·&nbsp; <a href="https://x.com/spvvqxn">x</a></sub>
+  <a href="https://instagram.com/ilyaxxing">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/instagram-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="assets/instagram-light.svg">
+      <img alt="Follow the build on Instagram: @ilyaxxing" src="assets/instagram-dark.svg" width="300">
+    </picture>
+  </a>
 </p>
