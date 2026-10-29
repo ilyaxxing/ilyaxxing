@@ -21,67 +21,54 @@ MONO = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
 
 THEMES = {
     "dark": dict(bg="#0E1116", line="#262C36", card="#161B22", text="#F0F6FC", muted="#8B949E",
-                 faint="#21262D", accent="#3FB950", accent_soft="#3FB95026", warm="#F0883E",
-                 hair="#5A4030", eyes="#0E1116", hoodie="#2EA043", hoodie_dark="#238636", lid="#C9D1D9", logo="#FFFFFF"),
+                 faint="#21262D", accent="#3FB950", accent_soft="#3FB95026", warm="#F0883E"),
     "light": dict(bg="#FFFFFF", line="#D0D7DE", card="#F6F8FA", text="#1F2328", muted="#59636E",
-                  faint="#E1E6EB", accent="#1A7F37", accent_soft="#1A7F3720", warm="#BC4C00",
-                  hair="#3B2A1F", eyes="#1F2328", hoodie="#2DA44E", hoodie_dark="#1A7F37", lid="#8C959F", logo="#FFFFFF"),
+                  faint="#E1E6EB", accent="#1A7F37", accent_soft="#1A7F3720", warm="#BC4C00"),
 }
 
 
 
-# pixel me at a laptop, 20 x 21 cells
-ME = [
-    "......HHHHHHHH......",
-    ".....HHHHHHHHHH.....",
-    "....HHHHHHHHHHHH....",
-    "....HHHHHHHHHHHH....",
-    "....HHSSSSSSSSHH....",
-    "....HSSSSSSSSSSH....",
-    "....SSEESSSSEESS....",
-    "....SSEESSSSEESS....",
-    "....SSSSSSSSSSSS....",
-    "....SSSSSMMSSSSS....",
-    ".....SSSSSSSSSS.....",
-    "........SSSS........",
-    "....DDDDWDDWDDDD....",
-    "..DDDDDDWDDWDDDDDD..",
-    ".DDDDDDDWDDWDDDDDDD.",
-    ".AAALLLLLLLLLLLLBBB.",
-    ".AAALLLLLLLLLLLLBBB.",
-    ".AAALLLLLGGLLLLLBBB.",
-    ".AAALLLLLGGLLLLLBBB.",
-    ".AAALLLLLLLLLLLLBBB.",
-    ".aaaLLLLLLLLLLLLbbb.",
-]
-assert all(len(r) == 20 for r in ME)
+
+import json
+MINER = json.loads((Path(__file__).parent / "art" / "miner.json").read_text())
 
 
-def me(t: dict, x: int, y: int, u: int = 6) -> str:
-    """Me, typing away. Eyes blink, head nods, hands tap, code floats up."""
-    pal = {"H": t["hair"], "S": "#E8B98F", "M": "#B9785A", "E": t["eyes"], "D": t["hoodie"],
-           "W": "#F0F6FC", "A": t["hoodie"], "B": t["hoodie"], "a": t["hoodie_dark"], "b": t["hoodie_dark"],
-           "L": t["lid"], "G": t["logo"]}
+def miner(t: dict, x: int, y: int, u: int = 4) -> str:
+    """Me, mining gold ore. Two frames swap, the rock shakes, sparks fly."""
+    pal = MINER["palette"]
 
-    def px(rows, keys, cls=""):
-        out = "".join(f'<rect x="{x + c * u}" y="{y + r * u}" width="{u}" height="{u}" fill="{pal[ch]}"/>'
-                      for r in rows for c, ch in enumerate(ME[r]) if ch in keys)
-        return f'<g class="{cls}">{out}</g>' if cls else out
+    def outlined(rows):
+        """Add a 1-cell dark outline around every sprite, NES style."""
+        h, w = len(rows), max(len(r) for r in rows)
+        grid = [list(r.ljust(w, ".")) for r in rows]
+        out = [row[:] for row in grid]
+        for r in range(h):
+            for c in range(w):
+                if grid[r][c] != ".":
+                    continue
+                if any(0 <= r + dr < h and 0 <= c + dc < w and grid[r + dr][c + dc] not in ".O"
+                       for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                    out[r][c] = "O"
+        return ["".join(row) for row in out]
 
-    head = range(0, 12)
-    body = range(12, len(ME))
-    floor = y + len(ME) * u
-    cx = x + 10 * u
-    bits = "".join(
-        f'<text class="bit b{k}" x="{bx}" y="{y + 15 * u}" font-family="{MONO}" font-size="16" fill="{c}">{s}</text>'
-        for k, (bx, s, c) in enumerate([(cx + 70, "{ }", t["accent"]), (cx - 110, "&lt;/&gt;", t["muted"]), (cx + 82, "✓", t["accent"])]))
+    pal = {**pal, "O": "#101216"}
+
+    def pixels(rows, r0=0, c0=0):
+        rows = outlined(rows)
+        return "".join(f'<rect x="{x + (c0 + c) * u}" y="{y + (r0 + r) * u}" width="{u}" height="{u}" fill="{pal[ch]}"/>'
+                       for r, row in enumerate(rows) for c, ch in enumerate(row) if ch != ".")
+    rr, rc = MINER["rock_at"]
+    hx, hy = x + rc * u, y + (rr + 3) * u          # where the pick lands
+    sparks = "".join(
+        f'<rect class="spark s{k}" x="{hx}" y="{hy}" width="{u}" height="{u}" fill="{c}"/>'
+        for k, c in enumerate(["#FFD43B", "#FFF3B0", "#FFD43B", "#D99A00"]))
+    floor = y + MINER["h"] * u
     return f"""<g shape-rendering="crispEdges">
-    {bits}
-    <g class="nod">{px(head, "HSM")}{px(head, "E", "eyes")}</g>
-    {px(body, "DWL")}
-    {px(body, "Aa", "tapL")}{px(body, "Bb", "tapR")}
-    {px(body, "G", "logo")}
-    <rect x="{x - 24}" y="{floor}" width="{20 * u + 48}" height="4" fill="{t['line']}"/>
+    <rect x="{x + 4 * u}" y="{floor}" width="{(MINER['w'] - 2) * u}" height="4" fill="{t['line']}"/>
+    <g class="rock">{pixels(MINER["rock"], rr, rc)}</g>
+    <g class="f0">{pixels(MINER["frames"][0])}</g>
+    <g class="f1">{pixels(MINER["frames"][1])}</g>
+    {sparks}
   </g>"""
 
 
@@ -114,27 +101,24 @@ def banner(t: dict) -> str:
     # stacked cards on the right: the one in progress peeks out behind
     cards = ""
     for p in behind:
-        cards += card(716, 84, p, t, front=False, opacity=0.9)
-    cards += card(690, 150, front, t, front=True)
+        cards += card(716, 50, p, t, front=False, opacity=0.9)
+    cards += card(690, 112, front, t, front=True)
 
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" role="img" aria-label="Clone it. Launch it. Get paid.">
   <style>
     .blink {{ animation: blink 1.8s ease-in-out infinite; }}
     @keyframes blink {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: .25 }} }}
-    .tapL {{ animation: tap .36s ease-in-out infinite; }}
-    .tapR {{ animation: tap .36s ease-in-out .18s infinite; }}
-    @keyframes tap {{ 0%,100% {{ transform: translateY(0) }} 50% {{ transform: translateY(3px) }} }}
-    .nod {{ animation: nod 2.2s ease-in-out infinite; }}
-    @keyframes nod {{ 0%,100% {{ transform: translateY(0) }} 50% {{ transform: translateY(2px) }} }}
-    .eyes {{ transform-box: fill-box; transform-origin: center; animation: wink 3.6s infinite; }}
-    @keyframes wink {{ 0%,92%,100% {{ transform: scaleY(1) }} 95% {{ transform: scaleY(.1) }} }}
-    .logo {{ animation: glow 2.4s ease-in-out infinite; }}
-    @keyframes glow {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: .35 }} }}
-    .bit {{ opacity: 0; animation: rise 3.6s ease-out infinite; }}
-    .b1 {{ animation-delay: 1.2s; }} .b2 {{ animation-delay: 2.4s; }}
-    @keyframes rise {{ 0% {{ opacity: 0; transform: translateY(0) }} 15% {{ opacity: 1 }} 100% {{ opacity: 0; transform: translateY(-70px) }} }}
-    @media (prefers-reduced-motion: reduce) {{ .blink, .tapL, .tapR, .nod, .eyes, .logo, .bit {{ animation: none; }} .bit {{ opacity: 0; }} }}
+    .f0 {{ animation: f0 1.1s steps(1) infinite; }}
+    .f1 {{ animation: f1 1.1s steps(1) infinite; }}
+    @keyframes f0 {{ 0% {{ opacity: 1 }} 55% {{ opacity: 0 }} }}
+    @keyframes f1 {{ 0% {{ opacity: 0 }} 55% {{ opacity: 1 }} }}
+    .rock {{ animation: shake 1.1s infinite; }}
+    @keyframes shake {{ 0%,55% {{ transform: translateX(0) }} 60% {{ transform: translateX(3px) }} 66% {{ transform: translateX(-2px) }} 72%,100% {{ transform: translateX(0) }} }}
+    .spark {{ opacity: 0; animation: spark 1.1s ease-out infinite; }}
+    @keyframes spark {{ 0%,54% {{ opacity: 0; transform: translate(0,0) }} 56% {{ opacity: 1; transform: translate(0,0) }} 95% {{ opacity: 0; transform: translate(var(--dx), var(--dy)) }} 100% {{ opacity: 0 }} }}
+    .s0 {{ --dx: -26px; --dy: -48px; }} .s1 {{ --dx: 8px; --dy: -60px; }} .s2 {{ --dx: -42px; --dy: -20px; }} .s3 {{ --dx: 24px; --dy: -34px; }}
+    @media (prefers-reduced-motion: reduce) {{ .blink, .f0, .f1, .rock, .spark {{ animation: none; }} .f1, .spark {{ opacity: 0; }} }}
   </style>
   <rect x="1" y="1" width="1198" height="598" rx="32" fill="{t['bg']}" stroke="{t['line']}" stroke-width="2"/>
 
@@ -149,9 +133,9 @@ def banner(t: dict) -> str:
 
   {cards}
 
-  <text x="700" y="490" font-family="{MONO}" font-size="19" fill="{t['muted']}">cookin' the</text>
-  <text x="700" y="516" font-family="{MONO}" font-size="19" fill="{t['muted']}">next one<tspan class="blink">_</tspan></text>
-  {me(t, 966, 404, 7)}
+  <text x="696" y="498" font-family="{MONO}" font-size="20" fill="{t['muted']}">grindin' on</text>
+  <text x="696" y="526" font-family="{MONO}" font-size="20" fill="{t['muted']}">the next one<tspan class="blink">_</tspan></text>
+  {miner(t, 846, 380, 6)}
 
 </svg>
 """
