@@ -1,20 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-label="100 business ideas. Real money.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-label="100 business ideas, testing what works">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop stop-color="#101714"/>
       <stop offset="1" stop-color="#18241d"/>
     </linearGradient>
-    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#c6ff5e"/>
-      <stop offset="1" stop-color="#62d88a"/>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#a9d89a"/>
+      <stop offset="1" stop-color="#6eb58e"/>
     </linearGradient>
   </defs>
   <rect width="1200" height="520" rx="36" fill="url(#bg)"/>
-  <circle cx="1080" cy="64" r="260" fill="#c6ff5e" opacity=".07"/>
-  <path d="M64 76v368" stroke="url(#glow)" stroke-width="10" stroke-linecap="round"/>
-  <text x="108" y="120" fill="#c6ff5e" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" letter-spacing="5">ILYAS  /  THE 100-BUSINESS RUN</text>
-  <text x="100" y="265" fill="#f4f5ef" font-family="Arial, Helvetica, sans-serif" font-size="108" font-weight="800" letter-spacing="-3">REAL IDEAS.</text>
-  <text x="100" y="378" fill="url(#glow)" font-family="Arial, Helvetica, sans-serif" font-size="108" font-weight="800" letter-spacing="-3">REAL MONEY.</text>
-  <text x="105" y="438" fill="#b4c1b4" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="500">Testing 100 business plays. Open-sourcing the winners.</text>
-  <text x="1090" y="445" fill="#c6ff5e" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="end">01 / 100</text>
+  <circle cx="1080" cy="64" r="260" fill="#a9d89a" opacity=".06"/>
+  <path d="M64 76v368" stroke="url(#accent)" stroke-width="8" stroke-linecap="round"/>
+  <text x="108" y="120" fill="#a9d89a" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="600" letter-spacing="3">100 BUSINESS IDEAS  ·  REAL-WORLD TESTS</text>
+  <text x="100" y="268" fill="#f0f2ec" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="700" letter-spacing="-2">TESTING WHAT WORKS</text>
+  <text x="105" y="370" fill="#b9c4b8" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="500">Business #01: Cash for Cars Lead System</text>
+  <text x="105" y="438" fill="#89978a" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="500">One project at a time · shared when it works</text>
 </svg>
