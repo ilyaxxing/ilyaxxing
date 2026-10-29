@@ -9,8 +9,8 @@ from pathlib import Path
 
 # newest last; status is "live" or "in progress"
 PROJECTS = [
-    dict(n=1, name="Cash for Cars", line1="QR card on a windshield.", line2="Buyer gets the lead instantly.", status="live"),
-    dict(n=2, name="Next", line1="", line2="", status="in progress"),
+    dict(n=1, name="Cash for Cars", line1="QR codes, anywhere you want.", line2="Buyer gets pinged instantly.", status="live"),
+    dict(n=2, name="Next up", line1="", line2="", status="cookin'"),
 ]
 
 OUT = Path(__file__).parent / "assets"
@@ -39,7 +39,7 @@ def card(x, y, p, t, front: bool, opacity=1.0) -> str:
                 f'<text x="{x + 32}" y="{y + 208}" font-family="{SANS}" font-size="23" fill="{t["muted"]}">{p["line2"]}</text>')
     return f"""<g opacity="{opacity}">
     <rect x="{x}" y="{y}" width="{w}" height="{h}" rx="22" fill="{t['card']}" stroke="{t['line']}" stroke-width="2"/>
-    <text x="{x + 32}" y="{y + 58}" font-family="{MONO}" font-size="24" fill="{t['muted']}">{"Latest" if p["status"] == "live" else "Next"}</text>
+    <text x="{x + 32}" y="{y + 58}" font-family="{MONO}" font-size="24" fill="{t['muted']}">{"Fresh drop" if p["status"] == "live" else "Next up"}</text>
     <rect x="{x + w - 32 - pill_w}" y="{y + 36}" width="{pill_w}" height="30" rx="15" fill="{t['accent_soft'] if live else 'none'}" stroke="{color if not live else 'none'}" stroke-dasharray="4 4"/>
     <circle class="{'blink' if live else ''}" cx="{x + w - 32 - pill_w + 18}" cy="{y + 51}" r="5" fill="{color}"/>
     <text x="{x + w - 32 - pill_w + 31}" y="{y + 57}" font-family="{MONO}" font-size="16" fill="{color}">{p['status']}</text>
@@ -60,7 +60,7 @@ def banner(t: dict) -> str:
     cards += card(690, 190, front, t, front=True)
 
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 576" width="1200" height="576" role="img" aria-label="Build it. Test it. Share it.">
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 576" width="1200" height="576" role="img" aria-label="Cook it up. Ship it. Share it.">
   <style>
     .blink {{ animation: blink 1.8s ease-in-out infinite; }}
     @keyframes blink {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: .25 }} }}
@@ -70,12 +70,12 @@ def banner(t: dict) -> str:
 
   <text x="72" y="96" font-family="{MONO}" font-size="24" letter-spacing="1" fill="{t['muted']}">@ilyaxxing</text>
   <g font-family="{SANS}" font-size="84" font-weight="800" letter-spacing="-2.5">
-    <text x="68" y="196" fill="{t['text']}">Build it.</text>
-    <text x="68" y="290" fill="{t['text']}">Test it.</text>
+    <text x="68" y="196" fill="{t['text']}">Cook it up.</text>
+    <text x="68" y="290" fill="{t['text']}">Ship it.</text>
     <text x="68" y="384" fill="{t['accent']}">Share it.</text>
   </g>
-  <text x="72" y="456" font-family="{SANS}" font-size="29" fill="{t['muted']}">Real projects, tried on real people.</text>
-  <text x="72" y="496" font-family="{SANS}" font-size="29" fill="{t['muted']}">The ones that work are open source.</text>
+  <text x="72" y="456" font-family="{SANS}" font-size="29" fill="{t['muted']}">Real stuff, tested on real people.</text>
+  <text x="72" y="496" font-family="{SANS}" font-size="29" fill="{t['muted']}">If it slaps, it goes open source.</text>
 
   {cards}
 
