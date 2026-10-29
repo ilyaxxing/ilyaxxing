@@ -1,7 +1,7 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg">
-  <img alt="100 shots at building real businesses" src="assets/banner-dark.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg?v=20261030">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg?v=20261030">
+  <img alt="100 business ideas. Real money." src="assets/banner-dark.svg?v=20261030" width="100%">
 </picture>
 
 ## 100 businesses. One goal: make money.
