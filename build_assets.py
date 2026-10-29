@@ -9,7 +9,7 @@ from pathlib import Path
 
 # newest last; status is "live" or "in progress"
 PROJECTS = [
-    dict(n=1, name="Cash for Cars", line1="QR codes, anywhere you want.", line2="Buyer gets pinged instantly.", status="live"),
+    dict(n=1, name="Cash for Cars", line1="QR lead system for car buyers.", line2="Set it up for them, charge for it.", status="live"),
     dict(n=2, name="Next up", line1="", line2="", status="cookin'"),
 ]
 
@@ -60,7 +60,7 @@ def banner(t: dict) -> str:
     cards += card(690, 190, front, t, front=True)
 
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 576" width="1200" height="576" role="img" aria-label="Cook it up. Ship it. Share it.">
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 576" width="1200" height="576" role="img" aria-label="Clone it. Launch it. Get paid.">
   <style>
     .blink {{ animation: blink 1.8s ease-in-out infinite; }}
     @keyframes blink {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: .25 }} }}
@@ -70,12 +70,12 @@ def banner(t: dict) -> str:
 
   <text x="72" y="96" font-family="{MONO}" font-size="24" letter-spacing="1" fill="{t['muted']}">@ilyaxxing</text>
   <g font-family="{SANS}" font-size="84" font-weight="800" letter-spacing="-2.5">
-    <text x="68" y="196" fill="{t['text']}">Cook it up.</text>
-    <text x="68" y="290" fill="{t['text']}">Ship it.</text>
-    <text x="68" y="384" fill="{t['accent']}">Share it.</text>
+    <text x="68" y="196" fill="{t['text']}">Clone it.</text>
+    <text x="68" y="290" fill="{t['text']}">Launch it.</text>
+    <text x="68" y="384" fill="{t['accent']}">Get paid.</text>
   </g>
-  <text x="72" y="456" font-family="{SANS}" font-size="29" fill="{t['muted']}">Real stuff, tested on real people.</text>
-  <text x="72" y="496" font-family="{SANS}" font-size="29" fill="{t['muted']}">If it slaps, it goes open source.</text>
+  <text x="72" y="456" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
+  <text x="72" y="496" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
 
   {cards}
 
