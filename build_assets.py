@@ -9,7 +9,7 @@ from pathlib import Path
 
 # newest last; status is "live" or "in progress"
 PROJECTS = [
-    dict(n=1, name="Cash for Cars", line1="QR lead system for car buyers.", line2="Set it up for them, charge for it.", status="live"),
+    dict(n=1, name="Cash for Cars", line1="QR lead system for car buyers.", line2="You set it up. They pay you.", status="live"),
     dict(n=2, name="Next up", line1="", line2="", status="cookin'"),
 ]
 

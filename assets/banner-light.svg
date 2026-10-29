@@ -28,7 +28,7 @@
     <rect x="1014" y="226" width="84" height="30" rx="15" fill="#1A7F3720" stroke="none" stroke-dasharray="4 4"/>
     <circle class="blink" cx="1032" cy="241" r="5" fill="#1A7F37"/>
     <text x="1045" y="247" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#1A7F37">live</text>
-    <text x="722" y="322" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="40" font-weight="700" fill="#1F2328">Cash for Cars</text><text x="722" y="366" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" fill="#59636E">QR lead system for car buyers.</text><text x="722" y="398" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" fill="#59636E">Set it up for them, charge for it.</text>
+    <text x="722" y="322" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="40" font-weight="700" fill="#1F2328">Cash for Cars</text><text x="722" y="366" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" fill="#59636E">QR lead system for car buyers.</text><text x="722" y="398" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" fill="#59636E">You set it up. They pay you.</text>
   </g>
 
 </svg>
