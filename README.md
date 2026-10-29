@@ -1,7 +1,7 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg?v=20261030">
-  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg?v=20261030">
-  <img alt="100 business ideas, tested in the real world" src="assets/banner-dark.svg?v=20261030" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg?v=20261030-2">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg?v=20261030-2">
+  <img alt="100 business ideas, testing what works" src="assets/banner-dark.svg?v=20261030-2" width="100%">
 </picture>
 
 ## 100 business ideas. Testing what works.
