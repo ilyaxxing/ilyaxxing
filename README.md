@@ -1,15 +1,35 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark-v2.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light-v2.svg">
-  <img alt="100 business ideas, testing what works" src="assets/banner-dark-v2.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg">
+  <img alt="Build it. Test it. Share it." src="assets/banner-dark.svg" width="100%">
 </picture>
 
-## 100 business ideas. Testing what works.
+<br>
 
-I try business ideas in the real world, then share the ones worth building on.
+I take an idea, build it, and put it in front of real people.<br>
+If it works, the whole thing goes open source, so anyone can take it and run it themselves.
 
-## Business #01: Cash for Cars Lead System
+<br>
 
-The first project in the series, already available in its own repository. It helps car buyers get leads from QR cards on windshields: the owner fills out a quick form, and the buyer gets the lead.
+### Cash for Cars &nbsp;<sub>live</sub>
 
-**[Open the Cash for Cars repository](https://github.com/ilyaxxing/cash-for-cars-lead-system)** · [See it live ↗](https://ilyaxxing.github.io/cash-for-cars-lead-system/)
+A QR card under a windshield wiper. The car owner scans it and fills a short form, the buyer gets a notification right away.
+
+[Code](https://github.com/ilyaxxing/cash-for-cars-lead-system) &nbsp;·&nbsp; [Live site ↗](https://ilyaxxing.github.io/cash-for-cars-lead-system/)
+
+### Next &nbsp;<sub>in progress</sub>
+
+Being built right now. It shows up here when it's out.
+
+<br>
+<br>
+
+<p align="center">
+  <a href="https://instagram.com/ilyaxxing">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/instagram-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="assets/instagram-light.svg">
+      <img alt="Instagram: @ilyaxxing" src="assets/instagram-dark.svg" width="300">
+    </picture>
+  </a>
+</p>

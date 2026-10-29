@@ -1,99 +1,84 @@
 #!/usr/bin/env python3
-"""Draws the banner used in README.md (dark + light versions).
+"""Draws every image used in README.md (dark + light versions).
 
     python3 build_assets.py
 
-When a business from the 100 goes public, bump PUBLIC by one and re-run.
-The grid fills up and the counter changes. That's it.
+When a new project goes public: add it to PROJECTS, re-run, commit.
 """
 from pathlib import Path
 
-PUBLIC = 1  # how many of the 100 are out in the world
+# newest last; status is "live" or "in progress"
+PROJECTS = [
+    dict(n=1, name="Cash for Cars", line1="QR card on a windshield.", line2="Buyer gets the lead instantly.", status="live"),
+    dict(n=2, name="Next", line1="", line2="", status="in progress"),
+]
 
 OUT = Path(__file__).parent / "assets"
 OUT.mkdir(exist_ok=True)
 
 SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
-SERIF = "Georgia, 'Iowan Old Style', 'Times New Roman', serif"
 MONO = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
 
 THEMES = {
-    "dark": dict(text="#F0F0EC", muted="#8B9098", faint="#30363D", accent="#8FD694", glow="#FFFFFF", glow_op="0.07"),
-    "light": dict(text="#1F2328", muted="#656D76", faint="#D8DEE4", accent="#3F9A4A", glow="#000000", glow_op="0"),
+    "dark": dict(bg="#0E1116", line="#262C36", card="#161B22", text="#F0F6FC", muted="#8B949E",
+                 faint="#21262D", accent="#3FB950", accent_soft="#3FB95026", warm="#F0883E"),
+    "light": dict(bg="#FFFFFF", line="#D0D7DE", card="#F6F8FA", text="#1F2328", muted="#59636E",
+                  faint="#E1E6EB", accent="#1A7F37", accent_soft="#1A7F3720", warm="#BC4C00"),
 }
 
 
-def clover(cx: float, cy: float, r: float, color: str) -> str:
-    """Three round leaves and a stem. Sways a little."""
-    leaves = "".join(
-        f'<circle cx="{cx + dx * r:.1f}" cy="{cy + dy * r:.1f}" r="{r:.1f}" fill="{color}"/>'
-        for dx, dy in [(0, -0.95), (-0.85, 0.35), (0.85, 0.35)]
-    )
-    stem = (f'<path d="M{cx:.1f},{cy + 0.4 * r:.1f} q{0.3 * r:.1f},{1.6 * r:.1f} {1.3 * r:.1f},{2.4 * r:.1f}" '
-            f'stroke="{color}" stroke-width="{0.38 * r:.1f}" stroke-linecap="round" fill="none"/>')
-    return (f'<g class="sway" style="transform-origin:{cx:.0f}px {cy + 2.6 * r:.0f}px">'
-            f'{leaves}{stem}</g>')
-
-
-def header(t: dict) -> str:
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="760" height="400" role="img" aria-label="ilyas. I build things on the internet, mostly to see what happens.">
-  <style>
-    .sway {{ animation: sway 7s ease-in-out infinite; }}
-    @keyframes sway {{ 0%,100% {{ transform: rotate(-7deg) }} 50% {{ transform: rotate(7deg) }} }}
-    @media (prefers-reduced-motion: reduce) {{ .sway {{ animation: none; }} }}
-  </style>
-  <defs>
-    <radialGradient id="lamp" gradientUnits="userSpaceOnUse" cx="260" cy="215" r="200">
-      <stop offset="0" stop-color="{t['glow']}" stop-opacity="{t['glow_op']}"/>
-      <stop offset="1" stop-color="{t['glow']}" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <rect width="760" height="400" fill="url(#lamp)"/>
-
-  <text x="0" y="214" font-family="{SANS}" font-size="168" font-weight="700" letter-spacing="-8" fill="{t['text']}">ilyas</text>
-  {clover(402, 104, 12, t['accent'])}
-
-  <text x="8" y="300" font-family="{SERIF}" font-style="italic" font-size="38" fill="{t['muted']}">I build things on the internet,</text>
-  <text x="8" y="350" font-family="{SERIF}" font-style="italic" font-size="38" fill="{t['muted']}">mostly to see what happens.</text>
-</svg>
-"""
-
-
-def progress(t: dict) -> str:
-    x0, x1, y = 56, 580, 40
-    x = x0 + (x1 - x0) * PUBLIC / 100
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 90" width="640" height="90" role="img" aria-label="{PUBLIC} of 100 businesses public">
-  <style>
-    .ring {{ animation: ring 3.2s ease-out infinite; transform-origin: {x:.0f}px {y}px; }}
-    @keyframes ring {{ 0% {{ transform: scale(1); opacity: .55 }} 100% {{ transform: scale(3.2); opacity: 0 }} }}
-    @media (prefers-reduced-motion: reduce) {{ .ring {{ animation: none; opacity: 0 }} }}
-  </style>
-  <text x="{x0 - 16}" y="{y + 5}" text-anchor="end" font-family="{MONO}" font-size="18" fill="{t['text']}">{PUBLIC:02d}</text>
-  <line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="{t['faint']}" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round"/>
-  <line x1="{x0}" y1="{y}" x2="{x:.1f}" y2="{y}" stroke="{t['accent']}" stroke-width="2" stroke-linecap="round"/>
-  <circle class="ring" cx="{x:.1f}" cy="{y}" r="5" fill="none" stroke="{t['accent']}" stroke-width="1.5"/>
-  <circle cx="{x:.1f}" cy="{y}" r="5" fill="{t['accent']}"/>
-  <text x="{x1 + 14}" y="{y + 5}" font-family="{MONO}" font-size="18" fill="{t['muted']}">100</text>
-  <text x="{x:.1f}" y="{y + 38}" font-family="{SERIF}" font-style="italic" font-size="19" fill="{t['muted']}">you are here</text>
-</svg>
-"""
+def card(x, y, p, t, front: bool, opacity=1.0) -> str:
+    w, h = 440, 236
+    live = p["status"] == "live"
+    color = t["accent"] if live else t["warm"]
+    pill_w = int(len(p["status"]) * 9.7 + 46)
+    body = ""
+    if front:
+        body = (f'<text x="{x + 32}" y="{y + 132}" font-family="{SANS}" font-size="40" font-weight="700" fill="{t["text"]}">{p["name"]}</text>'
+                f'<text x="{x + 32}" y="{y + 176}" font-family="{SANS}" font-size="23" fill="{t["muted"]}">{p["line1"]}</text>'
+                f'<text x="{x + 32}" y="{y + 208}" font-family="{SANS}" font-size="23" fill="{t["muted"]}">{p["line2"]}</text>')
+    return f"""<g opacity="{opacity}">
+    <rect x="{x}" y="{y}" width="{w}" height="{h}" rx="22" fill="{t['card']}" stroke="{t['line']}" stroke-width="2"/>
+    <text x="{x + 32}" y="{y + 58}" font-family="{MONO}" font-size="24" fill="{t['muted']}">{"Latest" if p["status"] == "live" else "Next"}</text>
+    <rect x="{x + w - 32 - pill_w}" y="{y + 36}" width="{pill_w}" height="30" rx="15" fill="{t['accent_soft'] if live else 'none'}" stroke="{color if not live else 'none'}" stroke-dasharray="4 4"/>
+    <circle class="{'blink' if live else ''}" cx="{x + w - 32 - pill_w + 18}" cy="{y + 51}" r="5" fill="{color}"/>
+    <text x="{x + w - 32 - pill_w + 31}" y="{y + 57}" font-family="{MONO}" font-size="16" fill="{color}">{p['status']}</text>
+    {body}
+  </g>"""
 
 
 def banner(t: dict) -> str:
-    """Big 'N / 100' with a 10x10 grid, one cell per business."""
-    cell, gap = 16, 6
-    gx, gy = 1280 - 72 - (10 * cell + 9 * gap), (360 - (10 * cell + 9 * gap)) / 2
-    cells = "".join(
-        f'<rect x="{gx + (i % 10) * (cell + gap)}" y="{gy + (i // 10) * (cell + gap):.0f}" width="{cell}" height="{cell}" rx="4" '
-        f'fill="{t["accent"] if i < PUBLIC else t["faint"]}"/>'
-        for i in range(100)
-    )
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" width="1280" height="360" role="img" aria-label="{PUBLIC} of 100 open-source businesses">
-  <text x="72" y="86" font-family="{MONO}" font-size="20" letter-spacing="0.5" fill="{t['muted']}">@ilyaxxing</text>
-  <text x="64" y="236" font-family="{SANS}" font-size="156" font-weight="700" letter-spacing="-6"><tspan fill="{t['accent']}">{PUBLIC}</tspan><tspan fill="{t['muted']}" font-weight="500"> / 100</tspan></text>
-  <text x="72" y="290" font-family="{SANS}" font-size="28" font-weight="600" fill="{t['text']}">Open-Source Businesses</text>
-  <text x="72" y="326" font-family="{MONO}" font-size="18" fill="{t['muted']}">clone → deploy → sell</text>
-  {cells}
+    live = [p for p in PROJECTS if p["status"] == "live"]
+    front = live[-1]
+    behind = [p for p in PROJECTS if p is not front][-1:]
+    done = len(live)
+
+    # stacked cards on the right: the one in progress peeks out behind
+    cards = ""
+    for p in behind:
+        cards += card(716, 124, p, t, front=False, opacity=0.9)
+    cards += card(690, 190, front, t, front=True)
+
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 576" width="1200" height="576" role="img" aria-label="Build it. Test it. Share it.">
+  <style>
+    .blink {{ animation: blink 1.8s ease-in-out infinite; }}
+    @keyframes blink {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: .25 }} }}
+    @media (prefers-reduced-motion: reduce) {{ .blink {{ animation: none; }} }}
+  </style>
+  <rect x="1" y="1" width="1198" height="574" rx="32" fill="{t['bg']}" stroke="{t['line']}" stroke-width="2"/>
+
+  <text x="72" y="96" font-family="{MONO}" font-size="24" letter-spacing="1" fill="{t['muted']}">@ilyaxxing</text>
+  <g font-family="{SANS}" font-size="84" font-weight="800" letter-spacing="-2.5">
+    <text x="68" y="196" fill="{t['text']}">Build it.</text>
+    <text x="68" y="290" fill="{t['text']}">Test it.</text>
+    <text x="68" y="384" fill="{t['accent']}">Share it.</text>
+  </g>
+  <text x="72" y="456" font-family="{SANS}" font-size="29" fill="{t['muted']}">Real projects, tried on real people.</text>
+  <text x="72" y="496" font-family="{SANS}" font-size="29" fill="{t['muted']}">The ones that work are open source.</text>
+
+  {cards}
+
 </svg>
 """
 
@@ -101,7 +86,7 @@ def banner(t: dict) -> str:
 def instagram(t: dict) -> str:
     """Pill-shaped Instagram link for the footer."""
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 64" width="340" height="64" role="img" aria-label="Instagram: @ilyaxxing">
-  <rect x="1" y="1" width="338" height="62" rx="31" fill="none" stroke="{t['faint']}" stroke-width="1.5"/>
+  <rect x="1" y="1" width="338" height="62" rx="31" fill="{t['bg']}" stroke="{t['line']}" stroke-width="1.5"/>
   <g fill="none" stroke="{t['text']}" stroke-width="2">
     <rect x="26" y="20" width="24" height="24" rx="7"/>
     <circle cx="38" cy="32" r="5.5"/>
@@ -113,6 +98,8 @@ def instagram(t: dict) -> str:
 """
 
 
+for old in OUT.glob("*.svg"):
+    old.unlink()
 for name, t in THEMES.items():
     (OUT / f"banner-{name}.svg").write_text(banner(t), encoding="utf-8")
     (OUT / f"instagram-{name}.svg").write_text(instagram(t), encoding="utf-8")
