@@ -21,54 +21,86 @@ MONO = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
 
 THEMES = {
     "dark": dict(bg="#0E1116", line="#262C36", card="#161B22", text="#F0F6FC", muted="#8B949E",
-                 faint="#21262D", accent="#3FB950", accent_soft="#3FB95026", warm="#F0883E"),
+                 faint="#21262D", accent="#3FB950", accent_soft="#3FB95026", warm="#F0883E",
+                 block_hi="#7EE787", block_lo="#1A7F37", dirt="#2A2118", dirt2="#3A2D20", coin_text="#FFD43B"),
     "light": dict(bg="#FFFFFF", line="#D0D7DE", card="#F6F8FA", text="#1F2328", muted="#59636E",
-                  faint="#E1E6EB", accent="#1A7F37", accent_soft="#1A7F3720", warm="#BC4C00"),
+                  faint="#E1E6EB", accent="#1A7F37", accent_soft="#1A7F3720", warm="#BC4C00",
+                  block_hi="#7EE787", block_lo="#116329", dirt="#C9A97A", dirt2="#B8956A", coin_text="#9A6700"),
 }
 
 
 
 
+import colorsys
 import json
-MINER = json.loads((Path(__file__).parent / "art" / "miner.json").read_text())
+import sys
+sys.path.insert(0, str(Path(__file__).parent / "art"))
+from props import BLOCK, COIN  # noqa: E402
+
+ME = json.loads((Path(__file__).parent / "art" / "me.json").read_text())
 
 
-def miner(t: dict, x: int, y: int, u: int = 4) -> str:
-    """Me, mining gold ore. Two frames swap, the rock shakes, sparks fly."""
-    pal = MINER["palette"]
+def lighten_vest(hexcol: str) -> str:
+    """The vest should read as very light grey: lift mid greys toward white."""
+    r, g, b = (int(hexcol[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    h, l, s = colorsys.rgb_to_hls(r, g, b)
+    if s < 0.25 and 0.45 < l < 0.85:
+        l = l + (0.97 - l) * 0.55
+    r, g, b = colorsys.hls_to_rgb(h, l, s)
+    return "#%02X%02X%02X" % (round(r * 255), round(g * 255), round(b * 255))
 
-    def outlined(rows):
-        """Add a 1-cell dark outline around every sprite, NES style."""
-        h, w = len(rows), max(len(r) for r in rows)
-        grid = [list(r.ljust(w, ".")) for r in rows]
-        out = [row[:] for row in grid]
-        for r in range(h):
-            for c in range(w):
-                if grid[r][c] != ".":
-                    continue
-                if any(0 <= r + dr < h and 0 <= c + dc < w and grid[r + dr][c + dc] not in ".O"
-                       for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-                    out[r][c] = "O"
-        return ["".join(row) for row in out]
 
-    pal = {**pal, "O": "#101216"}
+def outlined(rows):
+    """1-cell dark outline around a sprite, NES style."""
+    h, w = len(rows), max(len(r) for r in rows)
+    grid = [list(r.ljust(w, ".")) for r in rows]
+    pad = [["."] * (w + 2) for _ in range(h + 2)]
+    for r in range(h):
+        for c in range(w):
+            pad[r + 1][c + 1] = grid[r][c]
+    out = [row[:] for row in pad]
+    for r in range(h + 2):
+        for c in range(w + 2):
+            if pad[r][c] == "." and any(0 <= r + dr < h + 2 and 0 <= c + dc < w + 2 and pad[r + dr][c + dc] != "."
+                                        for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                out[r][c] = "!"
+    return ["".join(row) for row in out]
 
-    def pixels(rows, r0=0, c0=0):
-        rows = outlined(rows)
-        return "".join(f'<rect x="{x + (c0 + c) * u}" y="{y + (r0 + r) * u}" width="{u}" height="{u}" fill="{pal[ch]}"/>'
-                       for r, row in enumerate(rows) for c, ch in enumerate(row) if ch != ".")
-    rr, rc = MINER["rock_at"]
-    hx, hy = x + rc * u, y + (rr + 3) * u          # where the pick lands
-    sparks = "".join(
-        f'<rect class="spark s{k}" x="{hx}" y="{hy}" width="{u}" height="{u}" fill="{c}"/>'
-        for k, c in enumerate(["#FFD43B", "#FFF3B0", "#FFD43B", "#D99A00"]))
-    floor = y + MINER["h"] * u
+
+def pixels(rows, pal, x, y, u):
+    return "".join(f'<rect x="{x + c * u}" y="{y + r * u}" width="{u}" height="{u}" fill="{pal[ch]}"/>'
+                   for r, row in enumerate(rows) for c, ch in enumerate(row) if ch != ".")
+
+
+def scene(t: dict, ground: int) -> str:
+    """Me jumping into a mystery block; a coin pops out."""
+    u = 3
+    me_pal = {k: lighten_vest(v) for k, v in ME["palette"].items()}
+    me_pal["!"] = "#101216"
+    body = outlined(ME["rows"])
+    mw, mh = len(body[0]), len(body)
+    mx, my = 868, ground - mh * u
+    fist_x = mx + 7 * u                       # raised fist, near the top-left of the sprite
+    jump = 46
+
+    bu = 4
+    prop_pal = {"O": "#101216", "L": t["block_hi"], "A": t["accent"], "D": t["block_lo"], "W": "#FFFFFF",
+                "Y": "#FFD43B", "y": "#D99A00", "Z": "#FFF6C4"}
+    bx = fist_x - len(BLOCK[0]) * bu // 2
+    by = my - jump - len(BLOCK) * bu + 12
+    cx = fist_x - len(COIN[0]) * bu // 2
+
+    ground_tiles = "".join(
+        f'<rect x="{x}" y="{ground + 8}" width="14" height="8" fill="{t["dirt"] if (x // 16) % 2 else t["dirt2"]}"/>'
+        f'<rect x="{x + 8}" y="{ground + 18}" width="14" height="8" fill="{t["dirt2"] if (x // 16) % 2 else t["dirt"]}"/>'
+        for x in range(700, 1136, 16))
     return f"""<g shape-rendering="crispEdges">
-    <rect x="{x + 4 * u}" y="{floor}" width="{(MINER['w'] - 2) * u}" height="4" fill="{t['line']}"/>
-    <g class="rock">{pixels(MINER["rock"], rr, rc)}</g>
-    <g class="f0">{pixels(MINER["frames"][0])}</g>
-    <g class="f1">{pixels(MINER["frames"][1])}</g>
-    {sparks}
+    <rect x="700" y="{ground}" width="450" height="6" fill="{t['accent']}"/>
+    {ground_tiles}
+    <g class="coin" style="transform-origin:{fist_x}px {by}px">{pixels(COIN, prop_pal, cx, by + 8, bu)}</g>
+    <g class="block">{pixels(BLOCK, prop_pal, bx, by, bu)}</g>
+    <g class="hero">{pixels(body, me_pal, mx - u, my - u, u)}</g>
+    <text class="plus" x="{bx - 44}" y="{by + 10}" font-family="{MONO}" font-size="22" font-weight="700" fill="{t['coin_text']}">+1</text>
   </g>"""
 
 
@@ -98,27 +130,34 @@ def banner(t: dict) -> str:
     behind = [p for p in PROJECTS if p is not front][-1:]
     done = len(live)
 
-    # stacked cards on the right: the one in progress peeks out behind
-    cards = ""
-    for p in behind:
-        cards += card(716, 50, p, t, front=False, opacity=0.9)
-    cards += card(690, 112, front, t, front=True)
 
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" role="img" aria-label="Clone it. Launch it. Get paid.">
   <style>
     .blink {{ animation: blink 1.8s ease-in-out infinite; }}
     @keyframes blink {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: .25 }} }}
-    .f0 {{ animation: f0 1.1s steps(1) infinite; }}
-    .f1 {{ animation: f1 1.1s steps(1) infinite; }}
-    @keyframes f0 {{ 0% {{ opacity: 1 }} 55% {{ opacity: 0 }} }}
-    @keyframes f1 {{ 0% {{ opacity: 0 }} 55% {{ opacity: 1 }} }}
-    .rock {{ animation: shake 1.1s infinite; }}
-    @keyframes shake {{ 0%,55% {{ transform: translateX(0) }} 60% {{ transform: translateX(3px) }} 66% {{ transform: translateX(-2px) }} 72%,100% {{ transform: translateX(0) }} }}
-    .spark {{ opacity: 0; animation: spark 1.1s ease-out infinite; }}
-    @keyframes spark {{ 0%,54% {{ opacity: 0; transform: translate(0,0) }} 56% {{ opacity: 1; transform: translate(0,0) }} 95% {{ opacity: 0; transform: translate(var(--dx), var(--dy)) }} 100% {{ opacity: 0 }} }}
-    .s0 {{ --dx: -26px; --dy: -48px; }} .s1 {{ --dx: 8px; --dy: -60px; }} .s2 {{ --dx: -42px; --dy: -20px; }} .s3 {{ --dx: 24px; --dy: -34px; }}
-    @media (prefers-reduced-motion: reduce) {{ .blink, .f0, .f1, .rock, .spark {{ animation: none; }} .f1, .spark {{ opacity: 0; }} }}
+    .hero {{ animation: hop 1.8s infinite; }}
+    @keyframes hop {{
+      0%,34% {{ transform: translateY(0); animation-timing-function: ease-out; }}
+      46% {{ transform: translateY(-46px); animation-timing-function: ease-in; }}
+      60% {{ transform: translateY(0); }}
+      64% {{ transform: translateY(2px); }}
+      68%,100% {{ transform: translateY(0); }}
+    }}
+    .block {{ animation: bump 1.8s infinite; }}
+    @keyframes bump {{ 0%,45% {{ transform: translateY(0) }} 49% {{ transform: translateY(-10px) }} 54%,100% {{ transform: translateY(0) }} }}
+    .coin {{ opacity: 0; animation: coin 1.8s infinite; }}
+    @keyframes coin {{
+      0%,45% {{ opacity: 0; transform: translateY(0) scaleX(1); }}
+      47% {{ opacity: 1; transform: translateY(-20px) scaleX(1); }}
+      56% {{ transform: translateY(-44px) scaleX(.15); }}
+      65% {{ transform: translateY(-58px) scaleX(1); }}
+      74% {{ opacity: 1; transform: translateY(-48px) scaleX(.15); }}
+      80%,100% {{ opacity: 0; transform: translateY(-36px) scaleX(1); }}
+    }}
+    .plus {{ opacity: 0; animation: plus 1.8s infinite; }}
+    @keyframes plus {{ 0%,62% {{ opacity: 0; transform: translateY(0) }} 68% {{ opacity: 1 }} 90% {{ opacity: 1; transform: translateY(-12px) }} 100% {{ opacity: 0; transform: translateY(-14px) }} }}
+    @media (prefers-reduced-motion: reduce) {{ .blink, .hero, .block, .coin, .plus {{ animation: none; }} .coin, .plus {{ opacity: 0; }} }}
   </style>
   <rect x="1" y="1" width="1198" height="598" rx="32" fill="{t['bg']}" stroke="{t['line']}" stroke-width="2"/>
 
@@ -131,11 +170,12 @@ def banner(t: dict) -> str:
   <text x="72" y="472" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
   <text x="72" y="512" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
 
-  {cards}
-
-  <text x="696" y="498" font-family="{MONO}" font-size="20" fill="{t['muted']}">grindin' on</text>
-  <text x="696" y="526" font-family="{MONO}" font-size="20" fill="{t['muted']}">the next one<tspan class="blink">_</tspan></text>
-  {miner(t, 846, 380, 6)}
+  <g font-family="{MONO}" font-size="17" text-anchor="end">
+    <text x="1130" y="98" fill="{t['muted']}">SHIPPED <tspan fill="{t['text']}" font-weight="700">01</tspan></text>
+    <text x="1130" y="128" fill="{t['muted']}">LATEST <tspan fill="{t['text']}">CASH FOR CARS</tspan></text>
+    <text x="1130" y="158" fill="{t['muted']}">NEXT <tspan fill="{t['warm']}">COOKIN'<tspan class="blink">_</tspan></tspan></text>
+  </g>
+  {scene(t, 540)}
 
 </svg>
 """
