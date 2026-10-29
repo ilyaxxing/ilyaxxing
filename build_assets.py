@@ -21,10 +21,68 @@ MONO = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
 
 THEMES = {
     "dark": dict(bg="#0E1116", line="#262C36", card="#161B22", text="#F0F6FC", muted="#8B949E",
-                 faint="#21262D", accent="#3FB950", accent_soft="#3FB95026", warm="#F0883E"),
+                 faint="#21262D", accent="#3FB950", accent_soft="#3FB95026", warm="#F0883E",
+                 hair="#5A4030", eyes="#0E1116", hoodie="#2EA043", hoodie_dark="#238636", lid="#C9D1D9", logo="#FFFFFF"),
     "light": dict(bg="#FFFFFF", line="#D0D7DE", card="#F6F8FA", text="#1F2328", muted="#59636E",
-                  faint="#E1E6EB", accent="#1A7F37", accent_soft="#1A7F3720", warm="#BC4C00"),
+                  faint="#E1E6EB", accent="#1A7F37", accent_soft="#1A7F3720", warm="#BC4C00",
+                  hair="#3B2A1F", eyes="#1F2328", hoodie="#2DA44E", hoodie_dark="#1A7F37", lid="#8C959F", logo="#FFFFFF"),
 }
+
+
+
+# pixel me at a laptop, 20 x 21 cells
+ME = [
+    "......HHHHHHHH......",
+    ".....HHHHHHHHHH.....",
+    "....HHHHHHHHHHHH....",
+    "....HHHHHHHHHHHH....",
+    "....HHSSSSSSSSHH....",
+    "....HSSSSSSSSSSH....",
+    "....SSEESSSSEESS....",
+    "....SSEESSSSEESS....",
+    "....SSSSSSSSSSSS....",
+    "....SSSSSMMSSSSS....",
+    ".....SSSSSSSSSS.....",
+    "........SSSS........",
+    "....DDDDWDDWDDDD....",
+    "..DDDDDDWDDWDDDDDD..",
+    ".DDDDDDDWDDWDDDDDDD.",
+    ".AAALLLLLLLLLLLLBBB.",
+    ".AAALLLLLLLLLLLLBBB.",
+    ".AAALLLLLGGLLLLLBBB.",
+    ".AAALLLLLGGLLLLLBBB.",
+    ".AAALLLLLLLLLLLLBBB.",
+    ".aaaLLLLLLLLLLLLbbb.",
+]
+assert all(len(r) == 20 for r in ME)
+
+
+def me(t: dict, x: int, y: int, u: int = 6) -> str:
+    """Me, typing away. Eyes blink, head nods, hands tap, code floats up."""
+    pal = {"H": t["hair"], "S": "#E8B98F", "M": "#B9785A", "E": t["eyes"], "D": t["hoodie"],
+           "W": "#F0F6FC", "A": t["hoodie"], "B": t["hoodie"], "a": t["hoodie_dark"], "b": t["hoodie_dark"],
+           "L": t["lid"], "G": t["logo"]}
+
+    def px(rows, keys, cls=""):
+        out = "".join(f'<rect x="{x + c * u}" y="{y + r * u}" width="{u}" height="{u}" fill="{pal[ch]}"/>'
+                      for r in rows for c, ch in enumerate(ME[r]) if ch in keys)
+        return f'<g class="{cls}">{out}</g>' if cls else out
+
+    head = range(0, 12)
+    body = range(12, len(ME))
+    floor = y + len(ME) * u
+    cx = x + 10 * u
+    bits = "".join(
+        f'<text class="bit b{k}" x="{bx}" y="{y + 15 * u}" font-family="{MONO}" font-size="16" fill="{c}">{s}</text>'
+        for k, (bx, s, c) in enumerate([(cx + 70, "{ }", t["accent"]), (cx - 110, "&lt;/&gt;", t["muted"]), (cx + 82, "✓", t["accent"])]))
+    return f"""<g shape-rendering="crispEdges">
+    {bits}
+    <g class="nod">{px(head, "HSM")}{px(head, "E", "eyes")}</g>
+    {px(body, "DWL")}
+    {px(body, "Aa", "tapL")}{px(body, "Bb", "tapR")}
+    {px(body, "G", "logo")}
+    <rect x="{x - 24}" y="{floor}" width="{20 * u + 48}" height="4" fill="{t['line']}"/>
+  </g>"""
 
 
 def card(x, y, p, t, front: bool, opacity=1.0) -> str:
@@ -56,28 +114,44 @@ def banner(t: dict) -> str:
     # stacked cards on the right: the one in progress peeks out behind
     cards = ""
     for p in behind:
-        cards += card(716, 124, p, t, front=False, opacity=0.9)
-    cards += card(690, 190, front, t, front=True)
+        cards += card(716, 84, p, t, front=False, opacity=0.9)
+    cards += card(690, 150, front, t, front=True)
 
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 576" width="1200" height="576" role="img" aria-label="Clone it. Launch it. Get paid.">
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" role="img" aria-label="Clone it. Launch it. Get paid.">
   <style>
     .blink {{ animation: blink 1.8s ease-in-out infinite; }}
     @keyframes blink {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: .25 }} }}
-    @media (prefers-reduced-motion: reduce) {{ .blink {{ animation: none; }} }}
+    .tapL {{ animation: tap .36s ease-in-out infinite; }}
+    .tapR {{ animation: tap .36s ease-in-out .18s infinite; }}
+    @keyframes tap {{ 0%,100% {{ transform: translateY(0) }} 50% {{ transform: translateY(3px) }} }}
+    .nod {{ animation: nod 2.2s ease-in-out infinite; }}
+    @keyframes nod {{ 0%,100% {{ transform: translateY(0) }} 50% {{ transform: translateY(2px) }} }}
+    .eyes {{ transform-box: fill-box; transform-origin: center; animation: wink 3.6s infinite; }}
+    @keyframes wink {{ 0%,92%,100% {{ transform: scaleY(1) }} 95% {{ transform: scaleY(.1) }} }}
+    .logo {{ animation: glow 2.4s ease-in-out infinite; }}
+    @keyframes glow {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: .35 }} }}
+    .bit {{ opacity: 0; animation: rise 3.6s ease-out infinite; }}
+    .b1 {{ animation-delay: 1.2s; }} .b2 {{ animation-delay: 2.4s; }}
+    @keyframes rise {{ 0% {{ opacity: 0; transform: translateY(0) }} 15% {{ opacity: 1 }} 100% {{ opacity: 0; transform: translateY(-70px) }} }}
+    @media (prefers-reduced-motion: reduce) {{ .blink, .tapL, .tapR, .nod, .eyes, .logo, .bit {{ animation: none; }} .bit {{ opacity: 0; }} }}
   </style>
-  <rect x="1" y="1" width="1198" height="574" rx="32" fill="{t['bg']}" stroke="{t['line']}" stroke-width="2"/>
+  <rect x="1" y="1" width="1198" height="598" rx="32" fill="{t['bg']}" stroke="{t['line']}" stroke-width="2"/>
 
-  <text x="72" y="96" font-family="{MONO}" font-size="24" letter-spacing="1" fill="{t['muted']}">@ilyaxxing</text>
+  <text x="72" y="112" font-family="{MONO}" font-size="24" letter-spacing="1" fill="{t['muted']}">@ilyaxxing</text>
   <g font-family="{SANS}" font-size="84" font-weight="800" letter-spacing="-2.5">
-    <text x="68" y="196" fill="{t['text']}">Clone it.</text>
-    <text x="68" y="290" fill="{t['text']}">Launch it.</text>
-    <text x="68" y="384" fill="{t['accent']}">Get paid.</text>
+    <text x="68" y="212" fill="{t['text']}">Clone it.</text>
+    <text x="68" y="306" fill="{t['text']}">Launch it.</text>
+    <text x="68" y="400" fill="{t['accent']}">Get paid.</text>
   </g>
-  <text x="72" y="456" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
-  <text x="72" y="496" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
+  <text x="72" y="472" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
+  <text x="72" y="512" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
 
   {cards}
+
+  <text x="700" y="490" font-family="{MONO}" font-size="19" fill="{t['muted']}">cookin' the</text>
+  <text x="700" y="516" font-family="{MONO}" font-size="19" fill="{t['muted']}">next one<tspan class="blink">_</tspan></text>
+  {me(t, 966, 404, 7)}
 
 </svg>
 """
