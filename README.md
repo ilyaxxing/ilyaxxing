@@ -4,26 +4,20 @@
   <img alt="Clone it. Launch it. Get paid." src="assets/banner-dark.svg" width="100%">
 </picture>
 
-<br>
+### Cash for Cars
 
-Every project here is a ready-to-go business, already tested in the real world.<br>
-Clone it, set it up for a client, and get paid. The code's free, the hustle's yours.
+`live` &nbsp;QR lead system for folks who buy used cars for cash.
 
-<br>
-
-### Cash for Cars &nbsp;<sub>live</sub>
-
-A lead system for folks who buy used cars for cash. Slap a QR code anywhere: business cards under wipers, flyers, signs, wherever. Someone scans it, fills out a quick form, and the buyer's phone lights up right away.
+Slap a QR code anywhere: business cards under wipers, flyers, signs, wherever. Someone scans it, fills out a quick form, and the buyer's phone lights up right away.
 
 **The play:** find local car buyers, hook 'em up, bill for the setup.
 
 [Code](https://github.com/ilyaxxing/cash-for-cars-lead-system) &nbsp;·&nbsp; [Live site ↗](https://ilyaxxing.github.io/cash-for-cars-lead-system/)
 
-### Next up &nbsp;<sub>cookin'</sub>
+### Next up
 
-Still in the oven. Drops here when it's ready.
+`cookin'` &nbsp;Still in the oven. Drops here when it's ready.
 
-<br>
 <br>
 
 <p align="center">
