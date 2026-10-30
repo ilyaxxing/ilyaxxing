@@ -1,33 +1,21 @@
-"""Pixel props for the banner: a mystery block and a coin. Keys -> colors are
-resolved per theme in build_assets.py ("A" family follows the accent)."""
+"""Pixel props for the banner. Each key maps to a colour in build_assets.py."""
 
-BLOCK = [
-    "..OOOOOOOOOO..",
-    ".OLLLLLLLLLLO.",
-    "OLLAAAAAAAAADO",
-    "OLAAAAWWWAAADO",
-    "OLAAAWAAAWAADO",
-    "OLAAAAAAAWAADO",
-    "OLAAAAAAWAAADO",
-    "OLAAAAAWAAAADO",
-    "OLAAAAAWAAAADO",
-    "OLAAAAAAAAAADO",
-    "OLAAAAAWAAAADO",
-    "OLAAAAAAAAAADO",
-    ".ODDDDDDDDDDO.",
-    "..OOOOOOOOOO..",
+DIAMOND = [
+    "..OOOOO..",
+    ".OCWCCcO.",
+    "OCWCCCCcO",
+    ".OCCCCcO.",
+    "..OCCcO..",
+    "...OcO...",
+    "....O....",
 ]
 
-COIN = [
-    "..OOOO..",
-    ".OYYYYO.",
-    "OYYZYYYO",
-    "OYZYYYyO",
-    "OYZYYYyO",
-    "OYZYYYyO",
-    "OYYYYyyO",
-    ".OyyyyO.",
-    "..OOOO..",
+SPARKLE = [
+    "..W..",
+    "..W..",
+    "WWWWW",
+    "..W..",
+    "..W..",
 ]
 
-assert all(len(r) == 14 for r in BLOCK) and all(len(r) == 8 for r in COIN)
+assert all(len(r) == 9 for r in DIAMOND) and all(len(r) == 5 for r in SPARKLE)

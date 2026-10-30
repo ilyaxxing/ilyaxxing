@@ -3,41 +3,44 @@
 
     python3 build_assets.py
 
-When a new project goes public: add it to PROJECTS, re-run, commit.
+The banner: me underground, taking a breather against a thin wall,
+with diamonds right behind it. The HUD numbers live in HUD below.
 """
+import colorsys
+import json
+import random
+import sys
 from pathlib import Path
 
-# newest last; status is "live" or "in progress"
-PROJECTS = [
-    dict(n=1, name="Cash for Cars", line1="QR lead system for car buyers.", line2="You set it up. They pay you.", status="live"),
-    dict(n=2, name="Next up", line1="", line2="", status="cookin'"),
-]
+ROOT = Path(__file__).parent
+sys.path.insert(0, str(ROOT / "art"))
+from props import DIAMOND, SPARKLE  # noqa: E402
 
-OUT = Path(__file__).parent / "assets"
+HUD = [("SHIPPED", "01", "text"), ("LATEST", "CASH FOR CARS", "text"), ("NEXT", "COOKIN'", "warm")]
+
+OUT = ROOT / "assets"
 OUT.mkdir(exist_ok=True)
+ME = json.loads((ROOT / "art" / "me.json").read_text())
 
 SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 MONO = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
 
 THEMES = {
-    "dark": dict(bg="#0E1116", line="#262C36", card="#161B22", text="#F0F6FC", muted="#8B949E",
-                 faint="#21262D", accent="#3FB950", accent_soft="#3FB95026", warm="#F0883E",
-                 block_hi="#7EE787", block_lo="#1A7F37", dirt="#2A2118", dirt2="#3A2D20", coin_text="#FFD43B"),
-    "light": dict(bg="#FFFFFF", line="#D0D7DE", card="#F6F8FA", text="#1F2328", muted="#59636E",
-                  faint="#E1E6EB", accent="#1A7F37", accent_soft="#1A7F3720", warm="#BC4C00",
-                  block_hi="#7EE787", block_lo="#116329", dirt="#C9A97A", dirt2="#B8956A", coin_text="#9A6700"),
+    "dark": dict(bg="#0E1116", line="#262C36", text="#F0F6FC", muted="#8B949E", accent="#3FB950", warm="#F0883E"),
+    "light": dict(bg="#FFFFFF", line="#D0D7DE", text="#1F2328", muted="#59636E", accent="#1A7F37", warm="#BC4C00"),
 }
 
+# underground palette (same in both themes: it's dirt)
+EARTH = dict(dirt="#5A3B24", dirt_dk="#47301E", speck="#6E4B2F", stone="#6F6C6A", stone_dk="#55524F",
+             cave="#1A120C", cave_lit="#24190F", grass="#3FB950", grass_dk="#2A8A3B", outline="#101216")
+GEM = {"O": "#0A3C46", "C": "#4FD8EB", "c": "#1D98AE", "W": "#E9FDFF"}
 
-
-
-import colorsys
-import json
-import sys
-sys.path.insert(0, str(Path(__file__).parent / "art"))
-from props import BLOCK, COIN  # noqa: E402
-
-ME = json.loads((Path(__file__).parent / "art" / "me.json").read_text())
+# terrain grid
+TX, TY, CELL = 700, 214, 8          # top-left of the dirt, cell size
+COLS, ROWS = 63, 49
+SURFACE = 3                         # grass row
+FLOOR = 40                          # tunnel floor row (exclusive)
+WALL = (41, 43)                     # the thin wall, columns [41, 43)
 
 
 def lighten_vest(hexcol: str) -> str:
@@ -53,11 +56,10 @@ def lighten_vest(hexcol: str) -> str:
 def outlined(rows):
     """1-cell dark outline around a sprite, NES style."""
     h, w = len(rows), max(len(r) for r in rows)
-    grid = [list(r.ljust(w, ".")) for r in rows]
     pad = [["."] * (w + 2) for _ in range(h + 2)]
-    for r in range(h):
-        for c in range(w):
-            pad[r + 1][c + 1] = grid[r][c]
+    for r, row in enumerate(rows):
+        for c, ch in enumerate(row):
+            pad[r + 1][c + 1] = ch
     out = [row[:] for row in pad]
     for r in range(h + 2):
         for c in range(w + 2):
@@ -72,94 +74,118 @@ def pixels(rows, pal, x, y, u):
                    for r, row in enumerate(rows) for c, ch in enumerate(row) if ch != ".")
 
 
-def scene(t: dict, ground: int) -> str:
-    """Me jumping into a mystery block; a coin pops out."""
-    u = 3
-    me_pal = {k: lighten_vest(v) for k, v in ME["palette"].items()}
-    me_pal["!"] = "#101216"
+def tunnel_cells():
+    """Which terrain cells are dug out: a slanted shaft from the surface, then a flat tunnel."""
+    dug = set()
+    for r in range(SURFACE, FLOOR):
+        a = 4 + (r - SURFACE) * 2 // 3
+        for c in range(a, a + 8):
+            dug.add((r, c))
+    for r in range(FLOOR - 18, FLOOR):
+        for c in range(14, WALL[0]):
+            dug.add((r, c))
+    return dug
+
+
+def underground() -> str:
+    rnd = random.Random(7)
+    dug = tunnel_cells()
+    x1, y1 = TX + COLS * CELL, TY + ROWS * CELL
+    parts = [f'<rect x="{TX}" y="{TY + (SURFACE + 1) * CELL}" width="{COLS * CELL}" height="{(ROWS - SURFACE - 1) * CELL}" fill="{EARTH["dirt"]}"/>']
+
+    # texture: specks and a few stones in the solid dirt
+    for r in range(SURFACE + 1, ROWS):
+        for c in range(COLS):
+            if (r, c) in dug:
+                continue
+            v = rnd.random()
+            if v < 0.10:
+                parts.append(f'<rect x="{TX + c * CELL}" y="{TY + r * CELL}" width="{CELL}" height="{CELL}" fill="{EARTH["dirt_dk"]}"/>')
+            elif v < 0.16:
+                parts.append(f'<rect x="{TX + c * CELL}" y="{TY + r * CELL}" width="{CELL}" height="{CELL}" fill="{EARTH["speck"]}"/>')
+    for r, c in [(9, 30), (14, 48), (27, 6), (36, 9), (8, 52), (31, 54)]:
+        if (r, c) not in dug:
+            parts.append(f'<rect x="{TX + c * CELL}" y="{TY + r * CELL}" width="{CELL * 2}" height="{CELL * 2}" fill="{EARTH["stone"]}"/>'
+                         f'<rect x="{TX + c * CELL + CELL}" y="{TY + r * CELL + CELL}" width="{CELL}" height="{CELL}" fill="{EARTH["stone_dk"]}"/>')
+
+    # grass on top (with a gap where the shaft starts)
+    for c in range(COLS):
+        if (SURFACE, c) in dug:
+            continue
+        parts.append(f'<rect x="{TX + c * CELL}" y="{TY + SURFACE * CELL}" width="{CELL}" height="{CELL}" fill="{EARTH["grass"]}"/>')
+        if rnd.random() < 0.35:
+            parts.append(f'<rect x="{TX + c * CELL}" y="{TY + (SURFACE - 1) * CELL + 4}" width="{CELL // 2}" height="{CELL // 2 + 0}" fill="{EARTH["grass"]}"/>')
+        parts.append(f'<rect x="{TX + c * CELL}" y="{TY + (SURFACE + 1) * CELL}" width="{CELL}" height="{CELL // 2}" fill="{EARTH["grass_dk"]}"/>')
+
+    # the dug-out tunnel, row by row
+    for r in range(SURFACE, FLOOR):
+        cs = sorted(c for (rr, c) in dug if rr == r)
+        if not cs:
+            continue
+        start = prev = cs[0]
+        for c in cs[1:] + [None]:
+            if c is not None and c == prev + 1:
+                prev = c
+                continue
+            parts.append(f'<rect x="{TX + start * CELL}" y="{TY + r * CELL}" width="{(prev - start + 1) * CELL}" height="{CELL}" fill="{EARTH["cave"]}"/>')
+            if c is not None:
+                start = prev = c
+    # a little light on the floor
+    parts.append(f'<rect x="{TX + 14 * CELL}" y="{TY + (FLOOR - 1) * CELL}" width="{(WALL[0] - 14) * CELL}" height="{CELL}" fill="{EARTH["cave_lit"]}"/>')
+
+    # diamonds behind the wall
+    gems, sparks = [], []
+    spots = [(26, 45), (31, 49), (35, 44), (28, 51), (35, 51), (32, 45)]
+    for k, (r, c) in enumerate(spots):
+        gx, gy = TX + c * CELL, TY + r * CELL
+        gems.append(pixels(outlined(DIAMOND), {**GEM, "!": "#0A2E35"}, gx - 4, gy - 4, 4))
+        sparks.append(f'<g class="spark" style="animation-delay:{k * 0.45:.2f}s">'
+                      f'{pixels(SPARKLE, {"W": GEM["W"]}, gx + 22, gy - 10, 3)}</g>')
+    return "".join(parts) + "".join(gems) + "".join(sparks)
+
+
+def me(ground_y: int, wall_x: int) -> str:
+    """Me sitting on the tunnel floor, back to the wall."""
+    u = 2
+    pal = {k: lighten_vest(v) for k, v in ME["palette"].items()}
+    pal["!"] = EARTH["outline"]
     body = outlined(ME["rows"])
-    mw, mh = len(body[0]), len(body)
-    mx, my = 868, ground - mh * u
-    fist_x = mx + 7 * u                       # raised fist, near the top-left of the sprite
-    jump = 46
-
-    bu = 4
-    prop_pal = {"O": "#101216", "L": t["block_hi"], "A": t["accent"], "D": t["block_lo"], "W": "#FFFFFF",
-                "Y": "#FFD43B", "y": "#D99A00", "Z": "#FFF6C4"}
-    bx = fist_x - len(BLOCK[0]) * bu // 2
-    by = my - jump - len(BLOCK) * bu + 12
-    cx = fist_x - len(COIN[0]) * bu // 2
-
-    ground_tiles = "".join(
-        f'<rect x="{x}" y="{ground + 8}" width="14" height="8" fill="{t["dirt"] if (x // 16) % 2 else t["dirt2"]}"/>'
-        f'<rect x="{x + 8}" y="{ground + 18}" width="14" height="8" fill="{t["dirt2"] if (x // 16) % 2 else t["dirt"]}"/>'
-        for x in range(700, 1136, 16))
-    return f"""<g shape-rendering="crispEdges">
-    <rect x="700" y="{ground}" width="450" height="6" fill="{t['accent']}"/>
-    {ground_tiles}
-    <g class="coin" style="transform-origin:{fist_x}px {by}px">{pixels(COIN, prop_pal, cx, by + 8, bu)}</g>
-    <g class="block">{pixels(BLOCK, prop_pal, bx, by, bu)}</g>
-    <g class="hero">{pixels(body, me_pal, mx - u, my - u, u)}</g>
-    <text class="plus" x="{bx - 44}" y="{by + 10}" font-family="{MONO}" font-size="22" font-weight="700" fill="{t['coin_text']}">+1</text>
-  </g>"""
+    w, h = len(body[0]), len(body)
+    x, y = wall_x - w * u, ground_y - h * u
+    return f'<g class="breathe" style="transform-origin:{x + w * u // 2}px {ground_y}px">{pixels(body, pal, x, y, u)}</g>'
 
 
-def card(x, y, p, t, front: bool, opacity=1.0) -> str:
-    w, h = 440, 236
-    live = p["status"] == "live"
-    color = t["accent"] if live else t["warm"]
-    pill_w = int(len(p["status"]) * 9.7 + 46)
-    body = ""
-    if front:
-        body = (f'<text x="{x + 32}" y="{y + 132}" font-family="{SANS}" font-size="40" font-weight="700" fill="{t["text"]}">{p["name"]}</text>'
-                f'<text x="{x + 32}" y="{y + 176}" font-family="{SANS}" font-size="23" fill="{t["muted"]}">{p["line1"]}</text>'
-                f'<text x="{x + 32}" y="{y + 208}" font-family="{SANS}" font-size="23" fill="{t["muted"]}">{p["line2"]}</text>')
-    return f"""<g opacity="{opacity}">
-    <rect x="{x}" y="{y}" width="{w}" height="{h}" rx="22" fill="{t['card']}" stroke="{t['line']}" stroke-width="2"/>
-    <text x="{x + 32}" y="{y + 58}" font-family="{MONO}" font-size="24" fill="{t['muted']}">{"Fresh drop" if p["status"] == "live" else "Next up"}</text>
-    <rect x="{x + w - 32 - pill_w}" y="{y + 36}" width="{pill_w}" height="30" rx="15" fill="{t['accent_soft'] if live else 'none'}" stroke="{color if not live else 'none'}" stroke-dasharray="4 4"/>
-    <circle class="{'blink' if live else ''}" cx="{x + w - 32 - pill_w + 18}" cy="{y + 51}" r="5" fill="{color}"/>
-    <text x="{x + w - 32 - pill_w + 31}" y="{y + 57}" font-family="{MONO}" font-size="16" fill="{color}">{p['status']}</text>
-    {body}
-  </g>"""
+def crumbs() -> str:
+    """Dirt crumbs falling from the tunnel ceiling."""
+    out = []
+    for k, c in enumerate([22, 30, 37]):
+        x = TX + c * CELL + 2
+        y = TY + (FLOOR - 18) * CELL
+        out.append(f'<rect class="crumb" style="animation-delay:{k * 1.3:.1f}s" x="{x}" y="{y}" width="4" height="4" fill="{EARTH["speck"]}"/>')
+    return "".join(out)
 
 
 def banner(t: dict) -> str:
-    live = [p for p in PROJECTS if p["status"] == "live"]
-    front = live[-1]
-    behind = [p for p in PROJECTS if p is not front][-1:]
-    done = len(live)
-
-
-
+    ground_y = TY + FLOOR * CELL
+    wall_x = TX + WALL[0] * CELL
+    hud = "".join(
+        f'<text x="1130" y="{86 + i * 28}" fill="{t["muted"]}">{k} <tspan fill="{t[col]}"{" font-weight=\"700\"" if i == 0 else ""}>{v}</tspan>'
+        f'{"<tspan class=\"blink\" fill=\"" + t[col] + "\">_</tspan>" if i == len(HUD) - 1 else ""}</text>'
+        for i, (k, v, col) in enumerate(HUD))
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" role="img" aria-label="Clone it. Launch it. Get paid.">
   <style>
     .blink {{ animation: blink 1.8s ease-in-out infinite; }}
     @keyframes blink {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: .25 }} }}
-    .hero {{ animation: hop 1.8s infinite; }}
-    @keyframes hop {{
-      0%,34% {{ transform: translateY(0); animation-timing-function: ease-out; }}
-      46% {{ transform: translateY(-46px); animation-timing-function: ease-in; }}
-      60% {{ transform: translateY(0); }}
-      64% {{ transform: translateY(2px); }}
-      68%,100% {{ transform: translateY(0); }}
-    }}
-    .block {{ animation: bump 1.8s infinite; }}
-    @keyframes bump {{ 0%,45% {{ transform: translateY(0) }} 49% {{ transform: translateY(-10px) }} 54%,100% {{ transform: translateY(0) }} }}
-    .coin {{ opacity: 0; animation: coin 1.8s infinite; }}
-    @keyframes coin {{
-      0%,45% {{ opacity: 0; transform: translateY(0) scaleX(1); }}
-      47% {{ opacity: 1; transform: translateY(-20px) scaleX(1); }}
-      56% {{ transform: translateY(-44px) scaleX(.15); }}
-      65% {{ transform: translateY(-58px) scaleX(1); }}
-      74% {{ opacity: 1; transform: translateY(-48px) scaleX(.15); }}
-      80%,100% {{ opacity: 0; transform: translateY(-36px) scaleX(1); }}
-    }}
-    .plus {{ opacity: 0; animation: plus 1.8s infinite; }}
-    @keyframes plus {{ 0%,62% {{ opacity: 0; transform: translateY(0) }} 68% {{ opacity: 1 }} 90% {{ opacity: 1; transform: translateY(-12px) }} 100% {{ opacity: 0; transform: translateY(-14px) }} }}
-    @media (prefers-reduced-motion: reduce) {{ .blink, .hero, .block, .coin, .plus {{ animation: none; }} .coin, .plus {{ opacity: 0; }} }}
+    .spark {{ opacity: 0; animation: spark 2.7s steps(1) infinite; }}
+    @keyframes spark {{ 0% {{ opacity: 0 }} 8% {{ opacity: 1 }} 16% {{ opacity: .4 }} 22%,100% {{ opacity: 0 }} }}
+    .breathe {{ animation: breathe 2.6s ease-in-out infinite; }}
+    @keyframes breathe {{ 0%,100% {{ transform: scaleY(1) }} 50% {{ transform: scaleY(1.012) }} }}
+    .crumb {{ opacity: 0; animation: crumb 3.9s ease-in infinite; }}
+    @keyframes crumb {{ 0% {{ opacity: 0; transform: translateY(0) }} 5% {{ opacity: 1 }} 30% {{ opacity: 1; transform: translateY(136px) }} 31%,100% {{ opacity: 0; transform: translateY(136px) }} }}
+    @media (prefers-reduced-motion: reduce) {{ .blink, .spark, .breathe, .crumb {{ animation: none; }} .crumb {{ opacity: 0; }} }}
   </style>
-  <rect x="1" y="1" width="1198" height="598" rx="32" fill="{t['bg']}" stroke="{t['line']}" stroke-width="2"/>
+  <defs><clipPath id="card"><rect x="1" y="1" width="1198" height="598" rx="32"/></clipPath></defs>
+  <rect x="1" y="1" width="1198" height="598" rx="32" fill="{t['bg']}"/>
 
   <text x="72" y="112" font-family="{MONO}" font-size="24" letter-spacing="1" fill="{t['muted']}">@ilyaxxing</text>
   <g font-family="{SANS}" font-size="84" font-weight="800" letter-spacing="-2.5">
@@ -170,13 +196,14 @@ def banner(t: dict) -> str:
   <text x="72" y="472" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
   <text x="72" y="512" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
 
-  <g font-family="{MONO}" font-size="17" text-anchor="end">
-    <text x="1130" y="98" fill="{t['muted']}">SHIPPED <tspan fill="{t['text']}" font-weight="700">01</tspan></text>
-    <text x="1130" y="128" fill="{t['muted']}">LATEST <tspan fill="{t['text']}">CASH FOR CARS</tspan></text>
-    <text x="1130" y="158" fill="{t['muted']}">NEXT <tspan fill="{t['warm']}">COOKIN'<tspan class="blink">_</tspan></tspan></text>
-  </g>
-  {scene(t, 540)}
+  <g font-family="{MONO}" font-size="17" text-anchor="end">{hud}</g>
 
+  <g clip-path="url(#card)" shape-rendering="crispEdges">
+    {underground()}
+    {crumbs()}
+    {me(ground_y, wall_x)}
+  </g>
+  <rect x="1" y="1" width="1198" height="598" rx="32" fill="none" stroke="{t['line']}" stroke-width="2"/>
 </svg>
 """
 
