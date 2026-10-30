@@ -201,6 +201,12 @@ def banner(t: dict) -> str:
   <text x="72" y="472" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
   <text x="72" y="512" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
 
+  <g font-family="{MONO}" font-size="19" text-anchor="end">
+    <text x="1130" y="104" fill="{t['muted']}">most people quit</text>
+    <text x="1130" y="134" fill="{t['muted']}">one block before the diamonds.</text>
+    <text x="1130" y="168" fill="{t['accent']}" font-weight="700">keep digging<tspan class="blink">_</tspan></text>
+  </g>
+
   <g clip-path="url(#card)" shape-rendering="crispEdges">
     {underground()}
     {crumbs()}
