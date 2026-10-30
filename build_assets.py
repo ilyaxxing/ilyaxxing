@@ -15,6 +15,9 @@ ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "art"))
 from props import DIAMOND, SPARKLE  # noqa: E402
 
+# the newest business that went out; shown above the scene
+LATEST = dict(name="Cash for Cars", line="QR lead system for car buyers")
+
 OUT = ROOT / "assets"
 OUT.mkdir(exist_ok=True)
 ME = json.loads((ROOT / "art" / "me.json").read_text())
@@ -201,10 +204,10 @@ def banner(t: dict) -> str:
   <text x="72" y="472" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
   <text x="72" y="512" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
 
-  <g font-family="{MONO}" font-size="19" text-anchor="end">
-    <text x="1130" y="104" fill="{t['muted']}">most people quit</text>
-    <text x="1130" y="134" fill="{t['muted']}">one block before the diamonds.</text>
-    <text x="1130" y="168" fill="{t['accent']}" font-weight="700">keep digging<tspan class="blink">_</tspan></text>
+  <g text-anchor="end">
+    <text x="1130" y="96" font-family="{MONO}" font-size="17" letter-spacing="1" fill="{t['muted']}">LATEST DROP</text>
+    <text x="1130" y="140" font-family="{SANS}" font-size="36" font-weight="800" letter-spacing="-0.5" fill="{t['text']}">{LATEST['name']}</text>
+    <text x="1130" y="176" font-family="{SANS}" font-size="20" fill="{t['muted']}">{LATEST['line']} <tspan fill="{t['accent']}">·</tspan> <tspan fill="{t['accent']}" font-weight="600">live</tspan> <tspan class="blink" fill="{t['accent']}">●</tspan></text>
   </g>
 
   <g clip-path="url(#card)" shape-rendering="crispEdges">
