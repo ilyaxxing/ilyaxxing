@@ -4,7 +4,7 @@
     python3 build_assets.py
 
 The banner: me underground, taking a breather against a thin wall,
-with diamonds right behind it. The HUD numbers live in HUD below.
+with diamonds right behind it.
 """
 import json
 import random
@@ -14,8 +14,6 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "art"))
 from props import DIAMOND, SPARKLE  # noqa: E402
-
-HUD = [("SHIPPED", "01", "text"), ("LATEST", "CASH FOR CARS", "text"), ("NEXT", "COOKIN'", "warm")]
 
 OUT = ROOT / "assets"
 OUT.mkdir(exist_ok=True)
@@ -179,10 +177,6 @@ def crumbs() -> str:
 
 
 def banner(t: dict) -> str:
-    hud = "".join(
-        f'<text x="1130" y="{86 + i * 28}" fill="{t["muted"]}">{k} <tspan fill="{t[col]}"{" font-weight=\"700\"" if i == 0 else ""}>{v}</tspan>'
-        f'{"<tspan class=\"blink\" fill=\"" + t[col] + "\">_</tspan>" if i == len(HUD) - 1 else ""}</text>'
-        for i, (k, v, col) in enumerate(HUD))
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" role="img" aria-label="Clone it. Launch it. Get paid.">
   <style>
     .blink {{ animation: blink 1.8s ease-in-out infinite; }}
@@ -206,8 +200,6 @@ def banner(t: dict) -> str:
   </g>
   <text x="72" y="472" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
   <text x="72" y="512" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
-
-  <g font-family="{MONO}" font-size="17" text-anchor="end">{hud}</g>
 
   <g clip-path="url(#card)" shape-rendering="crispEdges">
     {underground()}
