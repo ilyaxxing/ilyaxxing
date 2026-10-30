@@ -195,19 +195,19 @@ def banner(t: dict) -> str:
   <defs><clipPath id="card"><rect x="1" y="1" width="1198" height="598" rx="32"/></clipPath></defs>
   <rect x="1" y="1" width="1198" height="598" rx="32" fill="{t['bg']}"/>
 
-  <text x="72" y="112" font-family="{MONO}" font-size="24" letter-spacing="1" fill="{t['muted']}">@ilyaxxing</text>
+  <text x="72" y="100" font-family="{MONO}" font-size="20" letter-spacing="1" fill="{t['muted']}">@ilyaxxing</text>
   <g font-family="{SANS}" font-size="84" font-weight="800" letter-spacing="-2.5">
-    <text x="68" y="212" fill="{t['text']}">Clone it.</text>
-    <text x="68" y="306" fill="{t['text']}">Launch it.</text>
-    <text x="68" y="400" fill="{t['accent']}">Get paid.</text>
+    <text x="68" y="196" fill="{t['text']}">Clone it.</text>
+    <text x="68" y="290" fill="{t['text']}">Launch it.</text>
+    <text x="68" y="384" fill="{t['accent']}">Get paid.</text>
   </g>
-  <text x="72" y="472" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
-  <text x="72" y="512" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
+  <text x="72" y="456" font-family="{SANS}" font-size="29" fill="{t['muted']}">Ready-to-run businesses, tested IRL.</text>
+  <text x="72" y="496" font-family="{SANS}" font-size="29" fill="{t['muted']}">The code is free. The hustle is yours.</text>
 
   <g text-anchor="end">
-    <text x="1130" y="96" font-family="{MONO}" font-size="17" letter-spacing="1" fill="{t['muted']}">LATEST DROP</text>
-    <text x="1130" y="140" font-family="{SANS}" font-size="36" font-weight="800" letter-spacing="-0.5" fill="{t['text']}">{LATEST['name']}</text>
-    <text x="1130" y="176" font-family="{SANS}" font-size="20" fill="{t['muted']}">{LATEST['line']} <tspan fill="{t['accent']}">·</tspan> <tspan fill="{t['accent']}" font-weight="600">live</tspan> <tspan class="blink" fill="{t['accent']}">●</tspan></text>
+    <text x="1130" y="100" font-family="{MONO}" font-size="20" letter-spacing="1" fill="{t['muted']}">LATEST DROP</text>
+    <text x="1130" y="146" font-family="{SANS}" font-size="36" font-weight="800" letter-spacing="-0.5" fill="{t['text']}">{LATEST['name']}</text>
+    <text x="1130" y="182" font-family="{SANS}" font-size="20" fill="{t['muted']}">{LATEST['line']} <tspan fill="{t['accent']}">·</tspan> <tspan fill="{t['accent']}" font-weight="600">live</tspan> <tspan class="blink" fill="{t['accent']}">●</tspan></text>
   </g>
 
   <g clip-path="url(#card)" shape-rendering="crispEdges">

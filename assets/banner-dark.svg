@@ -13,19 +13,19 @@
   <defs><clipPath id="card"><rect x="1" y="1" width="1198" height="598" rx="32"/></clipPath></defs>
   <rect x="1" y="1" width="1198" height="598" rx="32" fill="#0E1116"/>
 
-  <text x="72" y="112" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="24" letter-spacing="1" fill="#8B949E">@ilyaxxing</text>
+  <text x="72" y="100" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="20" letter-spacing="1" fill="#8B949E">@ilyaxxing</text>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="84" font-weight="800" letter-spacing="-2.5">
-    <text x="68" y="212" fill="#F0F6FC">Clone it.</text>
-    <text x="68" y="306" fill="#F0F6FC">Launch it.</text>
-    <text x="68" y="400" fill="#3FB950">Get paid.</text>
+    <text x="68" y="196" fill="#F0F6FC">Clone it.</text>
+    <text x="68" y="290" fill="#F0F6FC">Launch it.</text>
+    <text x="68" y="384" fill="#3FB950">Get paid.</text>
   </g>
-  <text x="72" y="472" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="29" fill="#8B949E">Ready-to-run businesses, tested IRL.</text>
-  <text x="72" y="512" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="29" fill="#8B949E">The code is free. The hustle is yours.</text>
+  <text x="72" y="456" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="29" fill="#8B949E">Ready-to-run businesses, tested IRL.</text>
+  <text x="72" y="496" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="29" fill="#8B949E">The code is free. The hustle is yours.</text>
 
   <g text-anchor="end">
-    <text x="1130" y="96" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="17" letter-spacing="1" fill="#8B949E">LATEST DROP</text>
-    <text x="1130" y="140" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="36" font-weight="800" letter-spacing="-0.5" fill="#F0F6FC">Cash for Cars</text>
-    <text x="1130" y="176" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20" fill="#8B949E">QR lead system for car buyers <tspan fill="#3FB950">·</tspan> <tspan fill="#3FB950" font-weight="600">live</tspan> <tspan class="blink" fill="#3FB950">●</tspan></text>
+    <text x="1130" y="100" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="20" letter-spacing="1" fill="#8B949E">LATEST DROP</text>
+    <text x="1130" y="146" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="36" font-weight="800" letter-spacing="-0.5" fill="#F0F6FC">Cash for Cars</text>
+    <text x="1130" y="182" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20" fill="#8B949E">QR lead system for car buyers <tspan fill="#3FB950">·</tspan> <tspan fill="#3FB950" font-weight="600">live</tspan> <tspan class="blink" fill="#3FB950">●</tspan></text>
   </g>
 
   <g clip-path="url(#card)" shape-rendering="crispEdges">
