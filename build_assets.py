@@ -6,7 +6,6 @@
 The banner: me underground, taking a breather against a thin wall,
 with diamonds right behind it. The HUD numbers live in HUD below.
 """
-import colorsys
 import json
 import random
 import sys
@@ -32,7 +31,7 @@ THEMES = {
 
 # underground palette (same in both themes: it's dirt)
 EARTH = dict(dirt="#5A3B24", dirt_dk="#47301E", speck="#6E4B2F", stone="#6F6C6A", stone_dk="#55524F",
-             cave="#1A120C", cave_lit="#24190F", grass="#3FB950", grass_dk="#2A8A3B", outline="#101216")
+             cave="#2E2116", cave_lit="#3A2A1C", grass="#3FB950", grass_dk="#2A8A3B", outline="#101216")
 GEM = {"O": "#0A3C46", "C": "#4FD8EB", "c": "#1D98AE", "W": "#E9FDFF"}
 
 # terrain grid
@@ -41,16 +40,8 @@ COLS, ROWS = 63, 49
 SURFACE = 3                         # grass row
 FLOOR = 40                          # tunnel floor row (exclusive)
 WALL = (41, 43)                     # the thin wall, columns [41, 43)
+ME_U = 2                            # sprite pixel size
 
-
-def lighten_vest(hexcol: str) -> str:
-    """The vest should read as very light grey: lift mid greys toward white."""
-    r, g, b = (int(hexcol[i:i + 2], 16) / 255 for i in (1, 3, 5))
-    h, l, s = colorsys.rgb_to_hls(r, g, b)
-    if s < 0.25 and 0.45 < l < 0.85:
-        l = l + (0.97 - l) * 0.55
-    r, g, b = colorsys.hls_to_rgb(h, l, s)
-    return "#%02X%02X%02X" % (round(r * 255), round(g * 255), round(b * 255))
 
 
 def outlined(rows):
@@ -74,15 +65,36 @@ def pixels(rows, pal, x, y, u):
                    for r, row in enumerate(rows) for c, ch in enumerate(row) if ch != ".")
 
 
+def me_box():
+    """Where my sprite goes (px): back against the wall, legs/seat on the floor.
+    The shovel blade is allowed to sink into the floor a little."""
+    u = ME_U
+    rows = outlined(ME["rows"])
+    h, w = len(rows), len(rows[0])
+    # lowest row that has pixels in the left half (legs and seat, not the shovel)
+    seat = max(r for r, row in enumerate(rows) if any(ch not in ".!" for ch in row[: int(w * 0.5)]))
+    ground_y = TY + FLOOR * CELL
+    wall_x = TX + WALL[0] * CELL
+    x = wall_x - w * u + u
+    y = ground_y - (seat + 1) * u
+    return x, y, w, h, rows
+
+
 def tunnel_cells():
-    """Which terrain cells are dug out: a slanted shaft from the surface, then a flat tunnel."""
+    """Dug-out cells: a straight shaft from the surface, then a low crawl tunnel
+    to the wall, just tall enough for me. Edges are a bit rough, like real digging."""
+    rnd = random.Random(3)
+    x, y, w, h, _ = me_box()
+    top = (y - TY) // CELL                    # ceiling right at my head
+    shaft = max(5, (x - TX) // CELL - 5)      # the shaft comes down just left of my feet
     dug = set()
     for r in range(SURFACE, FLOOR):
-        a = 4 + (r - SURFACE) * 2 // 3
-        for c in range(a, a + 8):
+        jitter = rnd.choice((-1, 0, 0, 1))
+        for c in range(shaft + jitter, shaft + 6 + rnd.choice((0, 0, 1))):
             dug.add((r, c))
-    for r in range(FLOOR - 18, FLOOR):
-        for c in range(14, WALL[0]):
+    for c in range(shaft, WALL[0]):
+        ceil = top + rnd.choice((0, 0, 0, 1, -1)) if c < (x - TX) // CELL else top
+        for r in range(ceil, FLOOR):
             dug.add((r, c))
     return dug
 
@@ -131,7 +143,8 @@ def underground() -> str:
             if c is not None:
                 start = prev = c
     # a little light on the floor
-    parts.append(f'<rect x="{TX + 14 * CELL}" y="{TY + (FLOOR - 1) * CELL}" width="{(WALL[0] - 14) * CELL}" height="{CELL}" fill="{EARTH["cave_lit"]}"/>')
+    lit = sorted(c for (r, c) in dug if r == FLOOR - 1)
+    parts.append(f'<rect x="{TX + lit[0] * CELL}" y="{TY + (FLOOR - 1) * CELL}" width="{len(lit) * CELL}" height="{CELL}" fill="{EARTH["cave_lit"]}"/>')
 
     # diamonds behind the wall
     gems, sparks = [], []
@@ -144,30 +157,28 @@ def underground() -> str:
     return "".join(parts) + "".join(gems) + "".join(sparks)
 
 
-def me(ground_y: int, wall_x: int) -> str:
+def me() -> str:
     """Me sitting on the tunnel floor, back to the wall."""
-    u = 2
-    pal = {k: lighten_vest(v) for k, v in ME["palette"].items()}
+    x, y, w, h, rows = me_box()
+    pal = dict(ME["palette"])
     pal["!"] = EARTH["outline"]
-    body = outlined(ME["rows"])
-    w, h = len(body[0]), len(body)
-    x, y = wall_x - w * u, ground_y - h * u
-    return f'<g class="breathe" style="transform-origin:{x + w * u // 2}px {ground_y}px">{pixels(body, pal, x, y, u)}</g>'
+    return (f'<g class="breathe" style="transform-origin:{x + w * ME_U // 2}px {y + h * ME_U}px">'
+            f'{pixels(rows, pal, x, y, ME_U)}</g>')
 
 
 def crumbs() -> str:
     """Dirt crumbs falling from the tunnel ceiling."""
     out = []
-    for k, c in enumerate([22, 30, 37]):
+    mx, my, _, _, _ = me_box()
+    c0 = (mx - TX) // CELL
+    for k, c in enumerate([c0 - 3, c0 + 2, c0 + 6]):
         x = TX + c * CELL + 2
-        y = TY + (FLOOR - 18) * CELL
+        y = (my // CELL) * CELL
         out.append(f'<rect class="crumb" style="animation-delay:{k * 1.3:.1f}s" x="{x}" y="{y}" width="4" height="4" fill="{EARTH["speck"]}"/>')
     return "".join(out)
 
 
 def banner(t: dict) -> str:
-    ground_y = TY + FLOOR * CELL
-    wall_x = TX + WALL[0] * CELL
     hud = "".join(
         f'<text x="1130" y="{86 + i * 28}" fill="{t["muted"]}">{k} <tspan fill="{t[col]}"{" font-weight=\"700\"" if i == 0 else ""}>{v}</tspan>'
         f'{"<tspan class=\"blink\" fill=\"" + t[col] + "\">_</tspan>" if i == len(HUD) - 1 else ""}</text>'
@@ -181,7 +192,7 @@ def banner(t: dict) -> str:
     .breathe {{ animation: breathe 2.6s ease-in-out infinite; }}
     @keyframes breathe {{ 0%,100% {{ transform: scaleY(1) }} 50% {{ transform: scaleY(1.012) }} }}
     .crumb {{ opacity: 0; animation: crumb 3.9s ease-in infinite; }}
-    @keyframes crumb {{ 0% {{ opacity: 0; transform: translateY(0) }} 5% {{ opacity: 1 }} 30% {{ opacity: 1; transform: translateY(136px) }} 31%,100% {{ opacity: 0; transform: translateY(136px) }} }}
+    @keyframes crumb {{ 0% {{ opacity: 0; transform: translateY(0) }} 5% {{ opacity: 1 }} 30% {{ opacity: 1; transform: translateY(120px) }} 31%,100% {{ opacity: 0; transform: translateY(120px) }} }}
     @media (prefers-reduced-motion: reduce) {{ .blink, .spark, .breathe, .crumb {{ animation: none; }} .crumb {{ opacity: 0; }} }}
   </style>
   <defs><clipPath id="card"><rect x="1" y="1" width="1198" height="598" rx="32"/></clipPath></defs>
@@ -201,7 +212,7 @@ def banner(t: dict) -> str:
   <g clip-path="url(#card)" shape-rendering="crispEdges">
     {underground()}
     {crumbs()}
-    {me(ground_y, wall_x)}
+    {me()}
   </g>
   <rect x="1" y="1" width="1198" height="598" rx="32" fill="none" stroke="{t['line']}" stroke-width="2"/>
 </svg>
